@@ -215,20 +215,68 @@
             .report-btn:hover {
                 background-color: #d35400;
             }
+        /* --- ARAMA ÇUBUĞU STİLLERİ --- */
+        .search-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%); /* Ortalamak için */
+            width: 90%;
+            max-width: 400px; /* Çok geniş ekranda dev gibi olmasın */
+            background: white;
+            border-radius: 30px; /* Google Maps gibi yuvarlak kenarlar */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Derinlik gölgesi */
+            display: flex;
+            align-items: center;
+            padding: 5px 5px 5px 20px;
+            z-index: 2000; /* Haritanın en üstünde dursun */
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            flex-grow: 1; /* Kalan boşluğu doldur */
+            font-size: 1rem;
+            color: #333;
+            padding: 10px 0;
+        }
+
+        .search-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+            object-fit: cover; /* Resmi yuvarlağa sığdır */
+            border: 2px solid #fff; /* Logoya çerçeve */
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        /* Arama sonuçları için özel etiket */
+        .venue-tag {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            display: block;
+            margin-bottom: 2px;
+        }
     </style>
 </head>
 <body>
 
     <div class="logo-area">YETU</div>
 
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Ürün ara (Örn: Filtre Kahve)...">
+        <img src="logo.png" class="search-logo" alt="YETU">
+    </div>
+
     <div id="map"></div>
 
     <div class="bottom-sheet" id="infoPanel">
         <div class="sheet-handle"></div>
         <button class="close-btn" onclick="closePanel()">✕</button>
-        
+
         <div class="sheet-content" id="panelContent">
-            </div>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -243,12 +291,12 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-       // 2. MOCK DATA 
+        // 2. MOCK DATA
         const venues = [
             {
                 id: 1,
                 name: "Sunshine Cafe",
-                coords: [39.88992749815751, 32.79066032352153], 
+                coords: [39.88992749815751, 32.79066032352153],
                 rating: 4.2,
                 reviews: 128,
                 products: [
@@ -275,7 +323,7 @@
             {
                 id: 2,
                 name: "Çatı Restoran",
-                coords: [39.89280919127174, 32.782262702338535], 
+                coords: [39.89280919127174, 32.782262702338535],
                 rating: 4.7,
                 reviews: 342,
                 products: [
@@ -301,13 +349,13 @@
             },
             {
                 id: 3,
-                name: "19. Yurt Restoranı", 
-                coords: [39.885744, 32.777485], 
-                rating: 4.7, 
-                reviews: 56, 
+                name: "19. Yurt Restoranı",
+                coords: [39.885744, 32.777485],
+                rating: 4.7,
+                reviews: 56,
                 products: [
                     {
-                        name: "Peperoni Pizza", 
+                        name: "Peperoni Pizza",
                         price: 235, // Güncel fiyat
                         oldPrice: 220, // Eski fiyat (Zam okunu için)
                         ingredients: "Peperoni, Kaşar, Pizza Hamuru",
@@ -316,7 +364,7 @@
                         lastUpdate: "3 hafta önce"
                     },
                     {
-                        name: "Karışık Pizza", 
+                        name: "Karışık Pizza",
                         price: 240,
                         oldPrice: 240,
                         ingredients: "Mısır, Sucuk, Sosis, Kaşar, Zeytin, Pizza Hamuru",
@@ -325,7 +373,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Mexican Pizza", 
+                        name: "Mexican Pizza",
                         price: 250, // Güncel fiyat
                         oldPrice: 250, // Eski fiyat (Zam okunu için)
                         ingredients: "Sucuk, Acı Sos, Kaşar, Pizza Hamuru",
@@ -334,7 +382,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Margarita Pizza", 
+                        name: "Margarita Pizza",
                         price: 220,
                         oldPrice: 200,
                         ingredients: "Kaşar, Pizza Hamuru",
@@ -343,7 +391,7 @@
                         lastUpdate: "2 ay önce"
                     },
                     {
-                        name: "Barbekü Pizza", 
+                        name: "Barbekü Pizza",
                         price: 250, // Güncel fiyat
                         oldPrice: 250, // Eski fiyat (Zam okunu için)
                         ingredients: "Tavuk, Barbekü Sos, Kaşar, Pizza Hamuru",
@@ -352,7 +400,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Ton Balıklı Pizza", 
+                        name: "Ton Balıklı Pizza",
                         price: 265,
                         oldPrice: 250,
                         ingredients: "Ton Balığı, Kaşar, Mısır, Zeytin, Pizza Hamuru",
@@ -361,7 +409,7 @@
                         lastUpdate: "3 hafta önce"
                     },
                     {
-                        name: "Üç Peynirli Pizza", 
+                        name: "Üç Peynirli Pizza",
                         price: 220, // Güncel fiyat
                         oldPrice: 220, // Eski fiyat (Zam okunu için)
                         ingredients: "Kaşar, Mozarella, Tulum Peyniri, Pizza Hamuru",
@@ -370,7 +418,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Çıtır Tenders", 
+                        name: "Çıtır Tenders",
                         price: 185,
                         oldPrice: 165,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
@@ -379,7 +427,7 @@
                         lastUpdate: "6 hafta önce"
                     },
                     {
-                        name: "Cajun Sepeti", 
+                        name: "Cajun Sepeti",
                         price: 185, // Güncel fiyat
                         oldPrice: 185, // Eski fiyat (Zam okunu için)
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
@@ -388,7 +436,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Cajun Dürüm", 
+                        name: "Cajun Dürüm",
                         price: 155,
                         oldPrice: 155,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat, Lavaş",
@@ -397,7 +445,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Külah Patso", 
+                        name: "Külah Patso",
                         price: 95, // Güncel fiyat
                         oldPrice: 90, // Eski fiyat (Zam okunu için)
                         ingredients: "Patates",
@@ -406,7 +454,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Crispy Chicken", 
+                        name: "Crispy Chicken",
                         price: 180,
                         oldPrice: 180,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
@@ -415,7 +463,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Tavuk Tako", 
+                        name: "Tavuk Tako",
                         price: 210, // Güncel fiyat
                         oldPrice: 195, // Eski fiyat (Zam okunu için)
                         ingredients: "Tavuk, Patates, Ekmek",
@@ -424,7 +472,7 @@
                         lastUpdate: "5 gün önce"
                     },
                     {
-                        name: "Penne Arabiata", 
+                        name: "Penne Arabiata",
                         price: 165,
                         oldPrice: 165,
                         ingredients: "Makarna, Domates, Sarımsak, Peynir",
@@ -433,7 +481,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Kekikli Tavuk", 
+                        name: "Kekikli Tavuk",
                         price: 185, // Güncel fiyat
                         oldPrice: 185, // Eski fiyat (Zam okunu için)
                         ingredients: "Kekik, Tavuk, Makarna, Salata",
@@ -442,7 +490,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Köri Soslu Tavuk", 
+                        name: "Köri Soslu Tavuk",
                         price: 185,
                         oldPrice: 175,
                         ingredients: "Köri Baharatı, Zerdeçal, Soğan, Sarımsak, Tavuk",
@@ -461,7 +509,7 @@
         // Haritaya marker ekleme döngüsü
         venues.forEach(venue => {
             const marker = L.marker(venue.coords).addTo(map);
-            
+
             // Marker'a tıklandığında çalışacak olay
             marker.on('click', () => {
                 openPanel(venue);
@@ -487,23 +535,23 @@
                     : '';
 
                 return `
-        <div class="menu-item">
-            <div class="item-details">
-                <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
-                <p class="item-desc">${prod.ingredients}</p>
-                ${allergensHtml}
-            </div>
-            <div class="price-box">
-                <div class="current-price">${prod.price} ₺</div>
-                ${priceChangeHtml}
-            </div>
-        </div>`;
+            <div class="menu-item">
+                <div class="item-details">
+                    <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
+                    <p class="item-desc">${prod.ingredients}</p>
+                    ${allergensHtml}
+                </div>
+                <div class="price-box">
+                    <div class="current-price">${prod.price} ₺</div>
+                    ${priceChangeHtml}
+                </div>
+            </div>`;
             }).join('');
 
             // 2. Navigasyon Linki
             const navLink = `https://www.google.com/maps/dir/?api=1&destination=${venue.coords[0]},${venue.coords[1]}&travelmode=walking`;
 
-            // 3. E-Posta Linki Oluşturma (YENİ EKLENEN KISIM)
+            // 3. E-Posta Linki Oluşturma
             // Konu başlığına otomatik olarak Mekan Adını yazar.
             // %0D%0A kodu alt satıra geçmek içindir.
             const mailSubject = `YETU Bildirim: ${venue.name}`;
@@ -512,30 +560,30 @@
 
             // 4. Panelin Ana HTML'ini oluştur
             const html = `
-        <div class="venue-header">
-            <h2 class="venue-name">${venue.name}</h2>
-            <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
-        </div>
-        
-        <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
-            📍 Yol Tarifi Al (Google Maps)
-        </button>
+            <div class="venue-header">
+                <h2 class="venue-name">${venue.name}</h2>
+                <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
+            </div>
 
-        <h3>Menü & Fiyatlar</h3>
-        <div style="margin-top: 15px;">
-            ${productsHtml}
-        </div>
+            <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
+                📍 Yol Tarifi Al (Google Maps)
+            </button>
 
-        <button class="report-btn" onclick="window.location.href='${mailLink}'">
-            📢 Hata / Fiyat Değişimi Bildir
-        </button>
-    `;
+            <h3>Menü & Fiyatlar</h3>
+            <div style="margin-top: 15px;">
+                ${productsHtml}
+            </div>
+
+            <button class="report-btn" onclick="window.location.href='${mailLink}'">
+                📢 Hata / Fiyat Değişimi Bildir
+            </button>
+        `;
 
             // 5. İçeriği panele bas ve paneli aç
             contentDiv.innerHTML = html;
             panel.classList.add('active');
         }
-       
+
         function closePanel() {
             panel.classList.remove('active');
         }
@@ -579,11 +627,11 @@
                 iconSize: [40, 40],
                 iconAnchor: [20, 20], // Tam ortasından dönsün diye
                 html: `
-                    <svg viewBox="0 0 24 24" width="40" height="40" style="transform: rotate(0deg);">
-                        <path fill="red" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
-                        <path fill="none" stroke="white" stroke-width="2" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
-                    </svg>
-                `
+                        <svg viewBox="0 0 24 24" width="40" height="40" style="transform: rotate(0deg);">
+                            <path fill="red" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
+                            <path fill="none" stroke="white" stroke-width="2" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
+                        </svg>
+                    `
             });
 
             // 2. Oku haritaya ekle (Konumun olduğu yere)
@@ -630,6 +678,84 @@
         map.on('locationerror', onLocationError);
 
         // --- KONUM BULMA ÖZELLİĞİ BİTİŞİ ---
+
+        // --- ARAMA ve FİYAT KARŞILAŞTIRMA MANTIĞI ---
+
+        const searchInput = document.getElementById('searchInput');
+
+        // Kullanıcı her harfe bastığında çalışır
+        searchInput.addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+
+            // Eğer kutu boşsa paneli kapat
+            if (searchTerm.length < 2) {
+                closePanel();
+                return;
+            }
+
+            let results = [];
+
+            // 1. TÜM MEKANLARI TARA
+            venues.forEach(venue => {
+                venue.products.forEach(prod => {
+                    // Eğer ürün ismi aranan kelimeyi içeriyorsa
+                    if (prod.name.toLowerCase().includes(searchTerm)) {
+                        results.push({
+                            product: prod,
+                            venueName: venue.name,
+                            venueCoords: venue.coords,
+                            venueRating: venue.rating
+                        });
+                    }
+                });
+            });
+
+            // 2. SONUÇLARI FİYATA GÖRE SIRALA (Ucuzdan Pahalıya)
+            results.sort((a, b) => a.product.price - b.product.price);
+
+            // 3. SONUÇLARI GÖSTER
+            if (results.length > 0) {
+                displaySearchResults(results, searchTerm);
+            }
+        });
+
+        function displaySearchResults(results, term) {
+            let htmlContent = `
+                <div class="venue-header">
+                    <h2 class="venue-name">"${term}" için Sonuçlar</h2>
+                    <div class="rating-badge">${results.length} ürün bulundu</div>
+                </div>
+                <div style="margin-top: 15px;">
+            `;
+
+            results.forEach(item => {
+                // Her ürün için Google Maps Navigasyon linki
+                const navLink = `https://www.google.com/maps/dir/?api=1&destination=${venue.coords[0]},${venue.coords[1]}&travelmode=walking`;
+
+                htmlContent += `
+                <div class="menu-item" style="border-left: 5px solid #27ae60;">
+                    <div class="item-details">
+                        <span class="venue-tag">📍 ${item.venueName} (${item.venueRating} puan)</span>
+                        <h4>${item.product.name}</h4>
+                        <p class="item-desc">${item.product.ingredients}</p>
+                        
+                        <button style="margin-top:5px; background:#3498db; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;" 
+                                onclick="window.open('${navLink}', '_blank')">
+                            Yol Tarifi ↗
+                        </button>
+                    </div>
+                    <div class="price-box">
+                        <div class="current-price" style="font-size: 1.2rem; color:#e74c3c;">${item.product.price} ₺</div>
+                    </div>
+                </div>`;
+            });
+
+            htmlContent += `</div>`;
+
+            contentDiv.innerHTML = htmlContent;
+            panel.classList.add('active');
+        }
+
     </script>
 </body>
 </html>
