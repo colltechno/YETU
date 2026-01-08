@@ -735,7 +735,7 @@
                 // DÜZELTİLEN KISIM BURASI:
                 // 1. "venue" yerine "item.venueCoords" kullandık.
                 // 2. Link yapısını düzelttik.
-                const navLink = `https://www.google.com/maps/dir/?api=1&destination=${venue.coords[0]},${venue.coords[1]}&travelmode=walking`;
+                const navLink = `https://www.google.com/maps?q=${item.venueCoords[0]},${item.venueCoords[1]}&mode=walking`;
 
                 htmlContent += `
                 <div class="menu-item" style="border-left: 5px solid #27ae60;">
@@ -762,4 +762,5 @@
         }
     </script>
 </body>
+
 </html>
