@@ -173,6 +173,28 @@
             transition: transform 0.2s linear; /* Yumuşak dönmesi için */
             z-index: 1000;
         }
+        /* Navigasyon Butonu Stili */
+        .nav-btn {
+            background-color: #2980b9; /* Mavi renk */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* İkon ile yazı arası boşluk */
+        }
+
+            .nav-btn:hover {
+                background-color: #1f618d;
+            }
     </style>
 </head>
 <body>
@@ -457,6 +479,29 @@
                     </div>
                 </div>`;
             }).join('');
+
+            // Navigasyon Linki Oluşturma
+            // Google Maps Link Formatı: https://www.google.com/maps/dir/?api=1&destination=ENLEM,BOYLAM
+            const navLink = `https://www.google.com/maps/dir/?api=1&destination=${venue.coords[0]},${venue.coords[1]}&travelmode=walking`;
+
+            const html = `
+                <div class="venue-header">
+                    <h2 class="venue-name">${venue.name}</h2>
+                    <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
+                </div>
+                
+                <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
+                    📍 Yol Tarifi Al (Google Maps)
+                </button>
+                <h3>Menü & Fiyatlar</h3>
+                <div style="margin-top: 15px;">
+                    ${productsHtml}
+                </div>
+            `;
+
+            contentDiv.innerHTML = html;
+            panel.classList.add('active');
+        }
 
             const html = `
                 <div class="venue-header">
