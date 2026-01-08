@@ -168,6 +168,11 @@
             font-weight: bold;
             color: #c0392b; /* ODTÜ Kırmızısı tonu */
         }
+        /* Yön Okunun Stili */
+        .user-heading-arrow {
+            transition: transform 0.2s linear; /* Yumuşak dönmesi için */
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -189,19 +194,18 @@
     <script>
         // 1. HARİTA AYARLARI
         // ODTÜ kampüs koordinatlarına (yaklaşık kütüphane/çarşı civarı) odaklanıyoruz
-        const map = L.map('map').setView([39.8914, 32.7778], 16);
+        const map = L.map('map').setView([39.8917541320506, 32.78581820941704], 16);
 
         // OpenStreetMap katmanını ekle
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-       // 2. MOCK DATA (GÜNCELLENMİŞ KONUMLAR)
+       // 2. MOCK DATA 
         const venues = [
             {
                 id: 1,
                 name: "Sunshine Cafe",
-                // YENİ KONUM: Çarşı Bölgesi (Yurtlar tarafı)
                 coords: [39.88992749815751, 32.79066032352153], 
                 rating: 4.2,
                 reviews: 128,
@@ -229,7 +233,6 @@
             {
                 id: 2,
                 name: "Çatı Restoran",
-                // YENİ KONUM: Endüstri Müh. Yanı
                 coords: [39.89280919127174, 32.782262702338535], 
                 rating: 4.7,
                 reviews: 342,
@@ -262,7 +265,7 @@
                 reviews: 56, 
                 products: [
                     {
-                        name: "Peperoni Pizza", // Örn: Tost
+                        name: "Peperoni Pizza", 
                         price: 235, // Güncel fiyat
                         oldPrice: 220, // Eski fiyat (Zam okunu için)
                         ingredients: "Peperoni, Kaşar, Pizza Hamuru",
@@ -271,7 +274,7 @@
                         lastUpdate: "3 hafta önce"
                     },
                     {
-                        name: "Karışık Pizza", // Örn: Çay
+                        name: "Karışık Pizza", 
                         price: 240,
                         oldPrice: 240,
                         ingredients: "Mısır, Sucuk, Sosis, Kaşar, Zeytin, Pizza Hamuru",
@@ -280,7 +283,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Mexican Pizza", // Örn: Tost
+                        name: "Mexican Pizza", 
                         price: 250, // Güncel fiyat
                         oldPrice: 250, // Eski fiyat (Zam okunu için)
                         ingredients: "Sucuk, Acı Sos, Kaşar, Pizza Hamuru",
@@ -289,7 +292,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Margarita Pizza", // Örn: Çay
+                        name: "Margarita Pizza", 
                         price: 220,
                         oldPrice: 200,
                         ingredients: "Kaşar, Pizza Hamuru",
@@ -298,7 +301,7 @@
                         lastUpdate: "2 ay önce"
                     },
                     {
-                        name: "Barbekü Pizza", // Örn: Tost
+                        name: "Barbekü Pizza", 
                         price: 250, // Güncel fiyat
                         oldPrice: 250, // Eski fiyat (Zam okunu için)
                         ingredients: "Tavuk, Barbekü Sos, Kaşar, Pizza Hamuru",
@@ -307,7 +310,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Ton Balıklı Pizza", // Örn: Çay
+                        name: "Ton Balıklı Pizza", 
                         price: 265,
                         oldPrice: 250,
                         ingredients: "Ton Balığı, Kaşar, Mısır, Zeytin, Pizza Hamuru",
@@ -316,7 +319,7 @@
                         lastUpdate: "3 hafta önce"
                     },
                     {
-                        name: "Üç Peynirli Pizza", // Örn: Tost
+                        name: "Üç Peynirli Pizza", 
                         price: 220, // Güncel fiyat
                         oldPrice: 220, // Eski fiyat (Zam okunu için)
                         ingredients: "Kaşar, Mozarella, Tulum Peyniri, Pizza Hamuru",
@@ -325,7 +328,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Çıtır Tenders", // Örn: Çay
+                        name: "Çıtır Tenders", 
                         price: 185,
                         oldPrice: 165,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
@@ -334,7 +337,7 @@
                         lastUpdate: "6 hafta önce"
                     },
                     {
-                        name: "Cajun Sepeti", // Örn: Tost
+                        name: "Cajun Sepeti", 
                         price: 185, // Güncel fiyat
                         oldPrice: 185, // Eski fiyat (Zam okunu için)
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
@@ -343,7 +346,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Cajun Dürüm", // Örn: Çay
+                        name: "Cajun Dürüm", 
                         price: 155,
                         oldPrice: 155,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat, Lavaş",
@@ -352,7 +355,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Külah Patso", // Örn: Tost
+                        name: "Külah Patso", 
                         price: 95, // Güncel fiyat
                         oldPrice: 90, // Eski fiyat (Zam okunu için)
                         ingredients: "Patates",
@@ -361,7 +364,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Crispy Chicken", // Örn: Çay
+                        name: "Crispy Chicken", 
                         price: 180,
                         oldPrice: 180,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
@@ -370,7 +373,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Tavuk Tako", // Örn: Tost
+                        name: "Tavuk Tako", 
                         price: 210, // Güncel fiyat
                         oldPrice: 195, // Eski fiyat (Zam okunu için)
                         ingredients: "Tavuk, Patates, Ekmek",
@@ -379,7 +382,7 @@
                         lastUpdate: "5 gün önce"
                     },
                     {
-                        name: "Penne Arabiata", // Örn: Çay
+                        name: "Penne Arabiata", 
                         price: 165,
                         oldPrice: 165,
                         ingredients: "Makarna, Domates, Sarımsak, Peynir",
@@ -388,7 +391,7 @@
                         lastUpdate: "Dün"
                     },
                     {
-                        name: "Kekikli Tavuk", // Örn: Tost
+                        name: "Kekikli Tavuk", 
                         price: 185, // Güncel fiyat
                         oldPrice: 185, // Eski fiyat (Zam okunu için)
                         ingredients: "Kekik, Tavuk, Makarna, Salata",
@@ -397,7 +400,7 @@
                         lastUpdate: "Bugün"
                     },
                     {
-                        name: "Köri Soslu Tavuk", // Örn: Çay
+                        name: "Köri Soslu Tavuk", 
                         price: 185,
                         oldPrice: 175,
                         ingredients: "Köri Baharatı, Zerdeçal, Soğan, Sarımsak, Tavuk",
@@ -505,6 +508,52 @@
                 fillOpacity: 1
             }).addTo(map)
                 .bindPopup("Şu an buradasınız").openPopup();
+            // --- YÖN OKU KODU BAŞLANGICI ---
+
+            // 1. Kırmızı bir ok ikonu oluştur (SVG formatında)
+            var arrowIcon = L.divIcon({
+                className: 'user-heading-arrow',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20], // Tam ortasından dönsün diye
+                html: `
+                    <svg viewBox="0 0 24 24" width="40" height="40" style="transform: rotate(0deg);">
+                        <path fill="red" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
+                        <path fill="none" stroke="white" stroke-width="2" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
+                    </svg>
+                `
+            });
+
+            // 2. Oku haritaya ekle (Konumun olduğu yere)
+            var headingMarker = L.marker(e.latlng, { icon: arrowIcon }).addTo(map);
+
+            // 3. Telefonun pusulasını dinle
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function (event) {
+                    var heading = null;
+
+                    // iOS (iPhone) için özel hesaplama
+                    if (event.webkitCompassHeading) {
+                        heading = event.webkitCompassHeading;
+                    }
+                    // Android için hesaplama
+                    else if (event.alpha) {
+                        heading = 360 - event.alpha;
+                    }
+
+                    // Eğer yön bilgisi alabildiysek oku döndür
+                    if (heading !== null) {
+                        // Leaflet ikonunun içindeki SVG'yi bul ve döndür
+                        var iconElement = headingMarker.getElement();
+                        if (iconElement) {
+                            var svg = iconElement.querySelector('svg');
+                            if (svg) {
+                                svg.style.transform = 'rotate(' + heading + 'deg)';
+                            }
+                        }
+                    }
+                });
+            }
+            // --- YÖN OKU KODU BİTİŞİ ---
         }
 
         // 3. Konum bulunamazsa (izin verilmezse) hata verme
@@ -521,5 +570,3 @@
     </script>
 </body>
 </html>
-
-
