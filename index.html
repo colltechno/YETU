@@ -687,7 +687,7 @@
         searchInput.addEventListener('input', function (e) {
             const searchTerm = e.target.value.toLowerCase();
 
-            // Eğer kutu boşsa paneli kapat
+            // Eğer kutu boşsa veya 2 harften azsa paneli kapat
             if (searchTerm.length < 2) {
                 closePanel();
                 return;
@@ -703,7 +703,7 @@
                         results.push({
                             product: prod,
                             venueName: venue.name,
-                            venueCoords: venue.coords,
+                            venueCoords: venue.coords, // Koordinatı buraya kaydettik
                             venueRating: venue.rating
                         });
                     }
@@ -716,6 +716,9 @@
             // 3. SONUÇLARI GÖSTER
             if (results.length > 0) {
                 displaySearchResults(results, searchTerm);
+            } else {
+                // Sonuç yoksa paneli kapatabiliriz veya "Sonuç yok" yazdırabiliriz
+                closePanel();
             }
         });
 
@@ -729,7 +732,9 @@
             `;
 
             results.forEach(item => {
-                // Her ürün için Google Maps Navigasyon linki
+                // DÜZELTİLEN KISIM BURASI:
+                // 1. "venue" yerine "item.venueCoords" kullandık.
+                // 2. Link yapısını düzelttik.
                 const navLink = `https://www.google.com/maps/dir/?api=1&destination=${venue.coords[0]},${venue.coords[1]}&travelmode=walking`;
 
                 htmlContent += `
@@ -755,7 +760,6 @@
             contentDiv.innerHTML = htmlContent;
             panel.classList.add('active');
         }
-
     </script>
 </body>
 </html>
