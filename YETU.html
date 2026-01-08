@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YETU - ODTÜ Kampüs Rehberi</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Harita Konteyneri */
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Alt Panel (Bottom Sheet) Stilleri */
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%; /* Başlangıçta ekran dışında */
+            left: 0;
+            width: 100%;
+            height: 70vh; /* Ekranın %70'ini kaplar */
+            background: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+            transition: bottom 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bottom-sheet.active {
+            bottom: 0;
+        }
+
+        /* Panel Tutacağı (Sürükleme hissi için) */
+        .sheet-handle {
+            width: 50px;
+            height: 5px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin: 15px auto;
+            flex-shrink: 0;
+        }
+
+        /* İçerik Alanı */
+        .sheet-content {
+            padding: 0 20px 20px 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            border: none;
+            background: #f0f0f0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Mekan Detay Stilleri */
+        .venue-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .venue-name {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .rating-badge {
+            display: inline-block;
+            background-color: #27ae60;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Menü Kartları */
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #fff;
+        }
+
+        .item-details h4 {
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .item-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .allergen-tag {
+            font-size: 0.7rem;
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+        }
+
+        .price-box {
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .current-price {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .price-change {
+            font-size: 0.7rem;
+            color: #e74c3c;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .price-stable {
+            color: #27ae60;
+        }
+
+        /* Logo Alanı */
+        .logo-area {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: #c0392b; /* ODTÜ Kırmızısı tonu */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-area">YETU</div>
+
+    <div id="map"></div>
+
+    <div class="bottom-sheet" id="infoPanel">
+        <div class="sheet-handle"></div>
+        <button class="close-btn" onclick="closePanel()">✕</button>
+        
+        <div class="sheet-content" id="panelContent">
+            </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // 1. HARİTA AYARLARI
+        // ODTÜ kampüs koordinatlarına (yaklaşık kütüphane/çarşı civarı) odaklanıyoruz
+        const map = L.map('map').setView([39.8914, 32.7778], 16);
+
+        // OpenStreetMap katmanını ekle
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+       // 2. MOCK DATA (GÜNCELLENMİŞ KONUMLAR)
+        const venues = [
+            {
+                id: 1,
+                name: "Sunshine Cafe",
+                // YENİ KONUM: Çarşı Bölgesi (Yurtlar tarafı)
+                coords: [39.88992749815751, 32.79066032352153], 
+                rating: 4.2,
+                reviews: 128,
+                products: [
+                    {
+                        name: "Tavuklu Sandviç",
+                        price: 85,
+                        oldPrice: 70,
+                        ingredients: "Baget ekmek, ızgara tavuk, marul, özel sos",
+                        allergens: ["Gluten", "Yumurta"],
+                        rating: 4.5,
+                        lastUpdate: "3 gün önce"
+                    },
+                    {
+                        name: "Filtre Kahve",
+                        price: 45,
+                        oldPrice: 45,
+                        ingredients: "%100 Arabica çekirdek",
+                        allergens: [],
+                        rating: 4.8,
+                        lastUpdate: "1 ay önce"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: "Çatı Restoran",
+                // YENİ KONUM: Endüstri Müh. Yanı
+                coords: [39.89280919127174, 32.782262702338535], 
+                rating: 4.7,
+                reviews: 342,
+                products: [
+                    {
+                        name: "Çatı Burger",
+                        price: 180,
+                        oldPrice: 150,
+                        ingredients: "150gr dana köfte, cheddar, karamelize soğan",
+                        allergens: ["Gluten", "Süt Ürünleri"],
+                        rating: 4.9,
+                        lastUpdate: "1 hafta önce"
+                    },
+                    {
+                        name: "Mercimek Çorbası",
+                        price: 50,
+                        oldPrice: 40,
+                        ingredients: "Kırmızı mercimek, tereyağlı sos",
+                        allergens: ["Süt Ürünleri"],
+                        rating: 4.3,
+                        lastUpdate: "2 gün önce"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                name: "19. Yurt Restoranı", 
+                coords: [39.885744, 32.777485], 
+                rating: 4.7, 
+                reviews: 56, 
+                products: [
+                    {
+                        name: "Peperoni Pizza", // Örn: Tost
+                        price: 235, // Güncel fiyat
+                        oldPrice: 220, // Eski fiyat (Zam okunu için)
+                        ingredients: "Peperoni, Kaşar, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
+                        rating: 4.2, // Ürün puanı
+                        lastUpdate: "3 hafta önce"
+                    },
+                    {
+                        name: "Karışık Pizza", // Örn: Çay
+                        price: 240,
+                        oldPrice: 240,
+                        ingredients: "Mısır, Sucuk, Sosis, Kaşar, Zeytin, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"],
+                        rating: 4.7,
+                        lastUpdate: "Dün"
+                    },
+                    {
+                        name: "Mexican Pizza", // Örn: Tost
+                        price: 250, // Güncel fiyat
+                        oldPrice: 250, // Eski fiyat (Zam okunu için)
+                        ingredients: "Sucuk, Acı Sos, Kaşar, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
+                        rating: 4.2, // Ürün puanı
+                        lastUpdate: "Bugün"
+                    },
+                    {
+                        name: "Margarita Pizza", // Örn: Çay
+                        price: 220,
+                        oldPrice: 200,
+                        ingredients: "Kaşar, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"],
+                        rating: 4.8,
+                        lastUpdate: "2 ay önce"
+                    },
+                    {
+                        name: "Barbekü Pizza", // Örn: Tost
+                        price: 250, // Güncel fiyat
+                        oldPrice: 250, // Eski fiyat (Zam okunu için)
+                        ingredients: "Tavuk, Barbekü Sos, Kaşar, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
+                        rating: 4.1, // Ürün puanı
+                        lastUpdate: "Bugün"
+                    },
+                    {
+                        name: "Ton Balıklı Pizza", // Örn: Çay
+                        price: 265,
+                        oldPrice: 250,
+                        ingredients: "Ton Balığı, Kaşar, Mısır, Zeytin, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"],
+                        rating: 4.9,
+                        lastUpdate: "3 hafta önce"
+                    },
+                    {
+                        name: "Üç Peynirli Pizza", // Örn: Tost
+                        price: 220, // Güncel fiyat
+                        oldPrice: 220, // Eski fiyat (Zam okunu için)
+                        ingredients: "Kaşar, Mozarella, Tulum Peyniri, Pizza Hamuru",
+                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
+                        rating: 5.0, // Ürün puanı
+                        lastUpdate: "Bugün"
+                    },
+                    {
+                        name: "Çıtır Tenders", // Örn: Çay
+                        price: 185,
+                        oldPrice: 165,
+                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
+                        allergens: ["Gluten, Yumurta"],
+                        rating: 4.9,
+                        lastUpdate: "6 hafta önce"
+                    },
+                    {
+                        name: "Cajun Sepeti", // Örn: Tost
+                        price: 185, // Güncel fiyat
+                        oldPrice: 185, // Eski fiyat (Zam okunu için)
+                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
+                        allergens: ["Gluten, Yumurta"], // Varsa alerjenler
+                        rating: 3.9, // Ürün puanı
+                        lastUpdate: "Bugün"
+                    },
+                    {
+                        name: "Cajun Dürüm", // Örn: Çay
+                        price: 155,
+                        oldPrice: 155,
+                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat, Lavaş",
+                        allergens: ["Gluten, Yumurta"],
+                        rating: 4.8,
+                        lastUpdate: "Dün"
+                    },
+                    {
+                        name: "Külah Patso", // Örn: Tost
+                        price: 95, // Güncel fiyat
+                        oldPrice: 90, // Eski fiyat (Zam okunu için)
+                        ingredients: "Patates",
+                        allergens: [], // Varsa alerjenler
+                        rating: 3.2, // Ürün puanı
+                        lastUpdate: "Bugün"
+                    },
+                    {
+                        name: "Crispy Chicken", // Örn: Çay
+                        price: 180,
+                        oldPrice: 180,
+                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
+                        allergens: ["Gluten, Yumurta"],
+                        rating: 4.4,
+                        lastUpdate: "Dün"
+                    },
+                    {
+                        name: "Tavuk Tako", // Örn: Tost
+                        price: 210, // Güncel fiyat
+                        oldPrice: 195, // Eski fiyat (Zam okunu için)
+                        ingredients: "Tavuk, Patates, Ekmek",
+                        allergens: ["Gluten"], // Varsa alerjenler
+                        rating: 4.3, // Ürün puanı
+                        lastUpdate: "5 gün önce"
+                    },
+                    {
+                        name: "Penne Arabiata", // Örn: Çay
+                        price: 165,
+                        oldPrice: 165,
+                        ingredients: "Makarna, Domates, Sarımsak, Peynir",
+                        allergens: ["Süt ürünü"],
+                        rating: 4.6,
+                        lastUpdate: "Dün"
+                    },
+                    {
+                        name: "Kekikli Tavuk", // Örn: Tost
+                        price: 185, // Güncel fiyat
+                        oldPrice: 185, // Eski fiyat (Zam okunu için)
+                        ingredients: "Kekik, Tavuk, Makarna, Salata",
+                        allergens: [], // Varsa alerjenler
+                        rating: 4.1, // Ürün puanı
+                        lastUpdate: "Bugün"
+                    },
+                    {
+                        name: "Köri Soslu Tavuk", // Örn: Çay
+                        price: 185,
+                        oldPrice: 175,
+                        ingredients: "Köri Baharatı, Zerdeçal, Soğan, Sarımsak, Tavuk",
+                        allergens: ["Süt ürünü"],
+                        rating: 5.0,
+                        lastUpdate: "Dün"
+                    }
+                    // Buraya daha fazla ürün ekleyebilirsin...
+                ]
+            }
+        ];
+        // 3. FONKSİYONLAR
+        const panel = document.getElementById('infoPanel');
+        const contentDiv = document.getElementById('panelContent');
+
+        // Haritaya marker ekleme döngüsü
+        venues.forEach(venue => {
+            const marker = L.marker(venue.coords).addTo(map);
+            
+            // Marker'a tıklandığında çalışacak olay
+            marker.on('click', () => {
+                openPanel(venue);
+                // Haritayı hafifçe yukarı kaydır ki marker panelin altında kalmasın
+                map.panTo([venue.coords[0] - 0.002, venue.coords[1]]);
+            });
+        });
+
+        function openPanel(venue) {
+            // HTML içeriğini oluştur
+            let productsHtml = venue.products.map(prod => {
+                // Fiyat değişim mantığı
+                let priceChangeHtml = '';
+                if(prod.price > prod.oldPrice) {
+                    priceChangeHtml = `<span class="price-change">▲ ${prod.oldPrice}₺'den yükseldi (${prod.lastUpdate})</span>`;
+                } else {
+                    priceChangeHtml = `<span class="price-change price-stable">● Fiyat sabit</span>`;
+                }
+
+                // Alerjen mantığı
+                let allergensHtml = prod.allergens.length > 0 
+                    ? `<div style="margin-top:5px;">${prod.allergens.map(a => `<span class="allergen-tag">⚠️ ${a}</span>`).join('')}</div>`
+                    : '';
+
+                return `
+                <div class="menu-item">
+                    <div class="item-details">
+                        <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
+                        <p class="item-desc">${prod.ingredients}</p>
+                        ${allergensHtml}
+                    </div>
+                    <div class="price-box">
+                        <div class="current-price">${prod.price} ₺</div>
+                        ${priceChangeHtml}
+                    </div>
+                </div>`;
+            }).join('');
+
+            const html = `
+                <div class="venue-header">
+                    <h2 class="venue-name">${venue.name}</h2>
+                    <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
+                </div>
+                <h3>Menü & Fiyatlar</h3>
+                <div style="margin-top: 15px;">
+                    ${productsHtml}
+                </div>
+            `;
+
+            contentDiv.innerHTML = html;
+            panel.classList.add('active');
+        }
+
+        function closePanel() {
+            panel.classList.remove('active');
+        }
+
+        // Haritada boş bir yere tıklanınca paneli kapat
+        map.on('click', closePanel);
+
+    </script>
+</body>
+</html>
