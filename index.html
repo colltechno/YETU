@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DEK277J82C"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-DEK277J82C');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YETU - ODTÜ Kampüs Rehberi</title>
-    
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -47,9 +56,9 @@
             flex-direction: column;
         }
 
-        .bottom-sheet.active {
-            bottom: 0;
-        }
+            .bottom-sheet.active {
+                bottom: 0;
+            }
 
         /* Panel Tutacağı (Sürükleme hissi için) */
         .sheet-handle {
@@ -150,7 +159,7 @@
             display: block;
             margin-top: 2px;
         }
-        
+
         .price-stable {
             color: #27ae60;
         }
