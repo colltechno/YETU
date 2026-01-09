@@ -528,6 +528,8 @@
         });
 
         function openPanel(venue) {
+            panel.style.transition = '';
+            panel.style.transform = ''; // Varsa manuel kaydırmayı da sıfırla
             // 1. Ürünlerin HTML içeriğini oluştur
             let productsHtml = venue.products.map(prod => {
                 // Fiyat değişim mantığı
