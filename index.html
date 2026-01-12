@@ -51,7 +51,6 @@
             border-top-right-radius: 20px;
             box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
             transition: bottom 0.4s cubic-bezier(0.1, 0.7, 0.1, 1);
-            will-change: transform;
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -545,6 +544,8 @@
         });
 
         function openPanel(venue) {
+            panel.style.transition = '';
+            panel.style.transform = ''; // Varsa manuel kaydırmayı da sıfırla
             // 1. Ürünlerin HTML içeriğini oluştur
             let productsHtml = venue.products.map(prod => {
                 // Fiyat değişim mantığı
@@ -610,20 +611,11 @@
 
             // 5. İçeriği panele bas ve paneli aç
             contentDiv.innerHTML = html;
-            panel.classList.remove('active');
-            panel.style.transition = '';
-            panel.style.transform = '';
-            void panel.offsetWidth;
             panel.classList.add('active');
         }
+
         function closePanel() {
             panel.classList.remove('active');
-            setTimeout(() => {
-                if (!panel.classList.contains('active')) {
-                    panel.style.transition = '';
-                    panel.style.transform = '';
-                }
-            }, 400);
         }
 
         // Haritada boş bir yere tıklanınca paneli kapat
@@ -798,60 +790,45 @@
             contentDiv.innerHTML = htmlContent;
             panel.classList.add('active');
         }
-        // --- AŞAĞI KAYDIRARAK KAPATMA MANTIĞI (MOBİL + MASAÜSTÜ UNIFIED) ---
+        // --- AŞAĞI KAYDIRARAK KAPATMA MANTIĞI (GÜNCELLENMİŞ) ---
 
+        // 1. Sadece tutacağı (handle) seçiyoruz
         const dragHandle = document.querySelector('.sheet-handle');
-        // 'panel' değişkeni zaten yukarıda tanımlı
+        // Not: 'panel' değişkeni zaten yukarıda tanımlıydı, aynen kullanıyoruz.
 
         let startY = 0;
         let currentY = 0;
         let isDragging = false;
 
-        // YARDIMCI: Olayın parmaktan mı mouse'dan mı geldiğini anlayan fonksiyon
-        const getClientY = (e) => {
-            // Eğer dokunmatik olaysa (touches dizisi varsa) ilk parmağı al, yoksa mouse koordinatını al
-            return e.touches ? e.touches[0].clientY : e.clientY;
-        };
-
-        // 1. SÜRÜKLEME BAŞLANGICI (Hem Mouse hem Dokunma)
-        const startDrag = (e) => {
-            // Sadece sol tık (mouse) veya dokunma ile çalışsın
-            if (e.type === 'mousedown' && e.button !== 0) return;
-
+        // Olayları 'dragHandle'a ekliyoruz
+        dragHandle.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
             isDragging = true;
-            startY = getClientY(e);
+            panel.style.transition = 'none'; // Sürüklerken gecikme olmasın
+        }, { passive: false }); // passive: false yaptık ki gerekirse müdahale edelim
 
-            // Animasyonu kapat (Anlık tepki için)
-            panel.style.transition = 'none';
-        };
-
-        // 2. SÜRÜKLEME HAREKETİ
-        const onDragMove = (e) => {
+        dragHandle.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
 
-            // Yazı seçmeyi engelle (Özellikle mouse ile çekerken mavi seçim olmasın diye)
-            // Ancak touch olaylarında sayfa kaydırmasını engellememek için pasif bırakıyoruz
-            if (e.cancelable && !e.touches) {
-                e.preventDefault();
-            }
+            // Varsayılan kaydırmayı engelle (Sayfa oynamasın, sadece panel oynasın)
+            e.preventDefault();
 
-            currentY = getClientY(e);
+            currentY = e.touches[0].clientY;
             const diff = currentY - startY;
 
-            // Sadece aşağı doğru çekiliyorsa panele hareket ver
+            // Sadece aşağı doğru çekiliyorsa
             if (diff > 0) {
                 panel.style.transform = `translateY(${diff}px)`;
             }
-        };
+        }, { passive: false });
 
-        // 3. SÜRÜKLEME BİTİŞİ
-        const endDrag = () => {
+        dragHandle.addEventListener('touchend', (e) => {
             if (!isDragging) return;
             isDragging = false;
 
             const diff = currentY - startY;
 
-            // Animasyonu geri aç (Yumuşak kapanış veya geri sekme için)
+            // Animasyonu geri aç
             panel.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)';
 
             // Eğer 100px'den fazla aşağı çekildiyse kapat
@@ -859,29 +836,14 @@
                 panel.style.transform = 'translateY(100%)';
                 setTimeout(() => {
                     closePanel();
-                    panel.style.transform = '';
-                    panel.style.transition = '';
+                    panel.style.transform = ''; // Sıfırla
+                    panel.style.transition = ''; // Sıfırla
                 }, 300);
             } else {
                 // Yeterince çekilmediyse yerine geri zıplasın
                 panel.style.transform = 'translateY(0)';
             }
-        };
-
-        // --- OLAY DİNLEYİCİLERİ (EVENT LISTENERS) ---
-
-        // Başlangıç olaylarını sadece 'dragHandle' (gri çubuk) üzerinde dinler
-        dragHandle.addEventListener('touchstart', startDrag, { passive: true });
-        dragHandle.addEventListener('mousedown', startDrag);
-
-        // Hareket ve Bitiş olaylarını 'document' (tüm sayfa) üzerinde dinler
-        // Mouse ile çubuğu tutup hızlıca aşağı çekerken 
-        // imleç çubuğun dışına taşabilir çubuktan taşsa bile sürükleme devam etsin diye
-        document.addEventListener('touchmove', onDragMove, { passive: false });
-        document.addEventListener('touchend', endDrag);
-
-        document.addEventListener('mousemove', onDragMove);
-        document.addEventListener('mouseup', endDrag);
+        });
     </script>
 </body>
 </html>
