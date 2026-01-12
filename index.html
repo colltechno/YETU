@@ -637,12 +637,27 @@
         var headingMarker = null;   // Kırmızı ok
         var accuracyCircle = null;  // Mavi geniş daire (Hata payı)
 
-        map.locate({ setView: true, maxZoom: 16, watch: true }); // 'watch: true' ile hareket ettikçe günceller
+        // watch: true -> Konumu sürekli takip et demektir.
+        // enableHighAccuracy: true -> Daha hassas (GPS) konum ister (şarjı biraz daha yer ama yürürken gereklidir).
+        map.locate({
+            watch: true,
+            enableHighAccuracy: true
+        });
+
+        // İlk konumu alıp almadığımızı kontrol eden bir bayrak
+        var isFirstLocation = true;
+
+        // Marker değişkenleri (Daha önce tanımlamıştık, tekrar hatırlatma)
+        var userMarker = null;
+        var headingMarker = null;
+        var accuracyCircle = null;
 
         function onLocationFound(e) {
             var radius = e.accuracy;
 
-            // 1. Mavi Geniş Daire (Hata Payı)
+            // --- 1. Markerları Güncelleme Kısmı (Aynı Kalıyor) ---
+
+            // Mavi Geniş Daire
             if (accuracyCircle) {
                 accuracyCircle.setLatLng(e.latlng);
                 accuracyCircle.setRadius(radius);
@@ -655,66 +670,40 @@
                 }).addTo(map);
             }
 
-            // 2. Mavi Nokta (Artık L.marker kullanıyoruz, circleMarker değil)
+            // Mavi Nokta
             if (userMarker) {
                 userMarker.setLatLng(e.latlng);
             } else {
-                // CSS ile oluşturduğumuz sınıfı kullanıyoruz
                 var dotIcon = L.divIcon({
-                    className: 'user-location-dot',
-                    iconSize: [16, 16], // CSS'teki boyutla aynı olmalı
-                    iconAnchor: [8, 8]  // Tam ortası (Boyutun yarısı)
+                    className: 'user-location-dot', // CSS sınıfın
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
                 });
-
                 userMarker = L.marker(e.latlng, { icon: dotIcon }).addTo(map)
                     .bindPopup("Şu an buradasınız");
             }
 
-            // 3. Kırmızı Yön Oku
+            // Kırmızı Ok
             if (headingMarker) {
                 headingMarker.setLatLng(e.latlng);
             } else {
+                // Ok oluşturma kodu (Önceki cevaptaki HTML kodu buraya gelecek)
                 var arrowIcon = L.divIcon({
                     className: 'user-heading-arrow',
                     iconSize: [40, 40],
-                    iconAnchor: [20, 20], // Tam ortadan dönmesi için
-                    html: `
-                <svg viewBox="0 0 24 24" width="40" height="40" style="transform: rotate(0deg); display:block;">
-                    <path fill="red" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
-                    <path fill="none" stroke="white" stroke-width="2" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" />
-                </svg>
-            `
+                    iconAnchor: [20, 20],
+                    html: `<svg viewBox="0 0 24 24" width="40" height="40" style="transform: rotate(0deg); display:block;"><path fill="red" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" /><path fill="none" stroke="white" stroke-width="2" d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" /></svg>`
                 });
                 headingMarker = L.marker(e.latlng, { icon: arrowIcon, zIndexOffset: 1000 }).addTo(map);
             }
 
-            // Yön okunun Z-index değerini yüksek tutuyoruz ki mavi noktanın üstünde kalsın
-        }
+            // --- 2. Kamera Odaklama Mantığı (YENİ KISIM) ---
 
-        // Pusula olayını dinleme (Bu kısım aynı kalabilir ama headingMarker kontrolü ekledik)
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', function (event) {
-                // Marker henüz oluşturulmadıysa işlem yapma
-                if (!headingMarker) return;
-
-                var heading = null;
-                if (event.webkitCompassHeading) {
-                    heading = event.webkitCompassHeading;
-                } else if (event.alpha) {
-                    heading = 360 - event.alpha;
-                }
-
-                if (heading !== null) {
-                    var iconElement = headingMarker.getElement();
-                    if (iconElement) {
-                        var svg = iconElement.querySelector('svg');
-                        if (svg) {
-                            // Dönüşü SVG'ye uyguluyoruz
-                            svg.style.transform = 'rotate(' + heading + 'deg)';
-                        }
-                    }
-                }
-            });
+            // Eğer bu aldığımız İLK konum ise haritayı oraya odakla
+            if (isFirstLocation) {
+                map.setView(e.latlng, 16); // 16 zoom seviyesine git
+                isFirstLocation = false;   // Artık ilk konum değil, bir daha odaklama yapma
+            }
         }
 
         // 3. Konum bulunamazsa (izin verilmezse) hata verme
