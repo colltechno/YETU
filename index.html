@@ -828,19 +828,29 @@
 
             const diff = currentY - startY;
 
-            // Animasyonu geri aç
-            panel.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)';
-
             // Eğer 100px'den fazla aşağı çekildiyse kapat
             if (diff > 100) {
+                // 1. Önce paneli animasyonla aşağı kaydır (Görsel olarak kapat)
+                panel.style.transition = 'transform 0.3s ease-out';
                 panel.style.transform = 'translateY(100%)';
+
+                // 2. Animasyon süresi (300ms) dolunca arka planda sıfırlama yap
                 setTimeout(() => {
+                    // "active" sınıfını kaldır (CSS ile bottom: -100% durumuna geçer)
                     closePanel();
-                    panel.style.transform = ''; // Sıfırla
-                    panel.style.transition = ''; // Sıfırla
-                }, 300);
+                    panel.style.transition = 'none';
+                    panel.style.transform = '';
+
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            panel.style.transition = '';
+                        }, 50);
+                    });
+
+                }, 300); // Bu süre (300ms) yukarıdaki CSS transition süresiyle aynı olmalı
             } else {
                 // Yeterince çekilmediyse yerine geri zıplasın
+                panel.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)';
                 panel.style.transform = 'translateY(0)';
             }
         });
