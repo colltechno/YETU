@@ -630,64 +630,61 @@
 
         // Haritada boş bir yere tıklanınca paneli kapat
         map.on('click', closePanel);
-        // --- KONUM BULMA ÖZELLİĞİ GÜNCELLENMİŞ HALİ ---
+        // --- KONUM BULMA ve YÖN ÖZELLİĞİ (GÜNCELLENMİŞ HİBRİT SİSTEM) ---
 
-        // Değişkenleri fonksiyonun dışında tanımlıyoruz ki her seferinde sıfırlanmasın
+        // Değişkenler
         var userMarker = null;      // Mavi nokta
         var headingMarker = null;   // Kırmızı ok
-        var accuracyCircle = null;  // Mavi geniş daire (Hata payı)
+        var accuracyCircle = null;  // Hata payı dairesi
+        var isFirstLocation = true; // İlk açılış kontrolü
+        var useGPSHeading = false;  // Yürüyor mu kontrolü (GPS vs Pusula)
 
-        // watch: true -> Konumu sürekli takip et demektir.
-        // enableHighAccuracy: true -> Daha hassas (GPS) konum ister (şarjı biraz daha yer ama yürürken gereklidir).
+        // 1. Konum takibini başlat (Sürekli izleme + Yüksek hassasiyet)
         map.locate({
             watch: true,
             enableHighAccuracy: true
         });
 
-        // İlk konumu alıp almadığımızı kontrol eden bir bayrak
-        var isFirstLocation = true;
+        // 2. Oku döndüren yardımcı fonksiyon
+        function rotateArrow(deg) {
+            if (!headingMarker) return;
 
-        // Marker değişkenleri (Daha önce tanımlamıştık, tekrar hatırlatma)
-        var userMarker = null;
-        var headingMarker = null;
-        var accuracyCircle = null;
+            var iconElement = headingMarker.getElement();
+            if (iconElement) {
+                var svg = iconElement.querySelector('svg');
+                if (svg) {
+                    // CSS transition sayesinde yumuşak dönecek
+                    svg.style.transform = `rotate(${deg}deg)`;
+                }
+            }
+        }
 
+        // 3. Konum bulunduğunda çalışacak ana fonksiyon
         function onLocationFound(e) {
             var radius = e.accuracy;
 
-            // --- 1. Markerları Güncelleme Kısmı (Aynı Kalıyor) ---
+            // --- A) Markerları Oluştur/Güncelle ---
 
-            // Mavi Geniş Daire
+            // Mavi Daire (Hata Payı)
             if (accuracyCircle) {
                 accuracyCircle.setLatLng(e.latlng);
                 accuracyCircle.setRadius(radius);
             } else {
-                accuracyCircle = L.circle(e.latlng, {
-                    color: 'blue',
-                    fillColor: '#3388ff',
-                    fillOpacity: 0.15,
-                    radius: radius
-                }).addTo(map);
+                accuracyCircle = L.circle(e.latlng, { color: 'blue', fillColor: '#3388ff', fillOpacity: 0.15, radius: radius }).addTo(map);
             }
 
-            // Mavi Nokta
+            // Mavi Nokta (Kullanıcı)
             if (userMarker) {
                 userMarker.setLatLng(e.latlng);
             } else {
-                var dotIcon = L.divIcon({
-                    className: 'user-location-dot', // CSS sınıfın
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 8]
-                });
-                userMarker = L.marker(e.latlng, { icon: dotIcon }).addTo(map)
-                    .bindPopup("Şu an buradasınız");
+                var dotIcon = L.divIcon({ className: 'user-location-dot', iconSize: [16, 16], iconAnchor: [8, 8] });
+                userMarker = L.marker(e.latlng, { icon: dotIcon }).addTo(map).bindPopup("Şu an buradasınız");
             }
 
-            // Kırmızı Ok
+            // Kırmızı Ok (Yön)
             if (headingMarker) {
                 headingMarker.setLatLng(e.latlng);
             } else {
-                // Ok oluşturma kodu (Önceki cevaptaki HTML kodu buraya gelecek)
                 var arrowIcon = L.divIcon({
                     className: 'user-heading-arrow',
                     iconSize: [40, 40],
@@ -697,22 +694,55 @@
                 headingMarker = L.marker(e.latlng, { icon: arrowIcon, zIndexOffset: 1000 }).addTo(map);
             }
 
-            // --- 2. Kamera Odaklama Mantığı (YENİ KISIM) ---
-
-            // Eğer bu aldığımız İLK konum ise haritayı oraya odakla
+            // --- B) Kamera Odaklama (Sadece ilk açılışta) ---
             if (isFirstLocation) {
-                map.setView(e.latlng, 16); // 16 zoom seviyesine git
-                isFirstLocation = false;   // Artık ilk konum değil, bir daha odaklama yapma
+                map.setView(e.latlng, 16);
+                isFirstLocation = false;
+            }
+
+            // --- C) Akıllı Yön Algılama (GPS vs Pusula) ---
+            // Hız 1 m/s'den (yaklaşık 3.6 km/s) büyükse yürüyordur.
+            if (e.speed && e.speed > 1 && e.heading !== null && !isNaN(e.heading)) {
+                useGPSHeading = true; // Yürüyor: Pusulayı sustur, GPS'i dinle.
+                rotateArrow(e.heading);
+            } else {
+                useGPSHeading = false; // Duruyor: Pusulaya geri dön.
             }
         }
 
-        // 3. Konum bulunamazsa (izin verilmezse) hata verme
-        function onLocationError(e) {
-            alert("Konum izni vermediğiniz için yerinizi haritada gösteremiyoruz.");
-            console.log("Konum alınamadı: " + e.message);
+        // 4. Pusula Sensörü Dinleyicisi
+        if (window.DeviceOrientationEvent) {
+            // Android Absolute Fix
+            var eventName = 'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' : 'deviceorientation';
+
+            window.addEventListener(eventName, function (event) {
+                // Eğer kullanıcı yürüyorsa (GPS aktifse) bu fonksiyonu hemen durdur.
+                if (useGPSHeading) return;
+
+                // Marker yoksa işlem yapma
+                if (!headingMarker) return;
+
+                var heading = null;
+
+                if (event.webkitCompassHeading) {
+                    heading = event.webkitCompassHeading; // iOS
+                } else if (event.absolute && event.alpha) {
+                    heading = 360 - event.alpha; // Android Absolute
+                } else if (event.alpha) {
+                    heading = 360 - event.alpha; // Android Standart
+                }
+
+                if (heading !== null) {
+                    rotateArrow(heading);
+                }
+            }, true);
         }
 
-        // Olayları haritaya bağla
+        function onLocationError(e) {
+            console.log("Konum hatası: " + e.message);
+            // Hata olursa kullanıcıyı rahatsız etmemek için alert vermiyoruz, konsola yazıyoruz.
+        }
+
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
 
