@@ -293,6 +293,79 @@
             width: 16px;
             height: 16px;
         }
+        /* --- GİRİŞ & PROFİL STİLLERİ --- */
+
+        /* Sağ Üstteki Yuvarlak Profil Butonu */
+        .profile-btn-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .profile-btn {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+            .profile-btn:active {
+                transform: scale(0.95);
+            }
+
+        /* Giriş Formu Tasarımı (Panel İçi) */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .auth-input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9f9f9;
+        }
+
+        .auth-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: #e74c3c;
+        }
+        /* Kırmızı */
+        .btn-secondary {
+            background-color: #34495e;
+            margin-top: 10px;
+        }
+        /* Gri */
+
+        .auth-toggle-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            cursor: pointer;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -305,6 +378,12 @@
     </div>
 
     <div id="map"></div>
+
+    <div class="profile-btn-container">
+        <button id="mainProfileBtn" class="profile-btn" onclick="openAuthPanel()">
+            👤
+        </button>
+    </div>
 
     <div class="bottom-sheet" id="infoPanel">
         <div class="sheet-handle"></div>
@@ -391,147 +470,363 @@
                 products: [
                     {
                         name: "Peperoni Pizza",
-                        price: 235, // Güncel fiyat
-                        oldPrice: 220, // Eski fiyat (Zam okunu için)
+                        price: 270,
+                        oldPrice: 235,
                         ingredients: "Peperoni, Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
-                        rating: 4.2, // Ürün puanı
-                        lastUpdate: "3 hafta önce"
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.2,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Karışık Pizza",
-                        price: 240,
+                        price: 275,
                         oldPrice: 240,
                         ingredients: "Mısır, Sucuk, Sosis, Kaşar, Zeytin, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"],
+                        allergens: ["Gluten", "Süt ürünü"],
                         rating: 4.7,
-                        lastUpdate: "Dün"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Mexican Pizza",
-                        price: 250, // Güncel fiyat
-                        oldPrice: 250, // Eski fiyat (Zam okunu için)
+                        price: 285,
+                        oldPrice: 250,
                         ingredients: "Sucuk, Acı Sos, Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
-                        rating: 4.2, // Ürün puanı
-                        lastUpdate: "Bugün"
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.2,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Margarita Pizza",
-                        price: 220,
-                        oldPrice: 200,
+                        price: 250,
+                        oldPrice: 220,
                         ingredients: "Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"],
+                        allergens: ["Gluten", "Süt ürünü"],
                         rating: 4.8,
-                        lastUpdate: "2 ay önce"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Barbekü Pizza",
-                        price: 250, // Güncel fiyat
-                        oldPrice: 250, // Eski fiyat (Zam okunu için)
+                        price: 285,
+                        oldPrice: 250,
                         ingredients: "Tavuk, Barbekü Sos, Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
-                        rating: 4.1, // Ürün puanı
-                        lastUpdate: "Bugün"
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.1,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Ton Balıklı Pizza",
-                        price: 265,
-                        oldPrice: 250,
+                        price: 300,
+                        oldPrice: 265,
                         ingredients: "Ton Balığı, Kaşar, Mısır, Zeytin, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"],
+                        allergens: ["Gluten", "Süt ürünü"],
                         rating: 4.9,
-                        lastUpdate: "3 hafta önce"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Üç Peynirli Pizza",
-                        price: 220, // Güncel fiyat
-                        oldPrice: 220, // Eski fiyat (Zam okunu için)
+                        price: 255,
+                        oldPrice: 220,
                         ingredients: "Kaşar, Mozarella, Tulum Peyniri, Pizza Hamuru",
-                        allergens: ["Gluten, Süt ürünü"], // Varsa alerjenler
-                        rating: 5.0, // Ürün puanı
-                        lastUpdate: "Bugün"
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 5.0,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Çıtır Tenders",
-                        price: 185,
-                        oldPrice: 165,
+                        price: 210,
+                        oldPrice: 185,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
-                        allergens: ["Gluten, Yumurta"],
+                        allergens: ["Gluten", "Yumurta"],
                         rating: 4.9,
-                        lastUpdate: "6 hafta önce"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Cajun Sepeti",
-                        price: 185, // Güncel fiyat
-                        oldPrice: 185, // Eski fiyat (Zam okunu için)
+                        price: 210,
+                        oldPrice: 185,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
-                        allergens: ["Gluten, Yumurta"], // Varsa alerjenler
-                        rating: 3.9, // Ürün puanı
-                        lastUpdate: "Bugün"
+                        allergens: ["Gluten", "Yumurta"],
+                        rating: 3.9,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Cajun Dürüm",
-                        price: 155,
+                        price: 180,
                         oldPrice: 155,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat, Lavaş",
-                        allergens: ["Gluten, Yumurta"],
+                        allergens: ["Gluten", "Yumurta"],
                         rating: 4.8,
-                        lastUpdate: "Dün"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Külah Patso",
-                        price: 95, // Güncel fiyat
-                        oldPrice: 90, // Eski fiyat (Zam okunu için)
+                        price: 115,
+                        oldPrice: 95,
                         ingredients: "Patates",
-                        allergens: [], // Varsa alerjenler
-                        rating: 3.2, // Ürün puanı
-                        lastUpdate: "Bugün"
+                        allergens: [],
+                        rating: 3.2,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Crispy Chicken",
-                        price: 180,
+                        price: 210,
                         oldPrice: 180,
                         ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
-                        allergens: ["Gluten, Yumurta"],
+                        allergens: ["Gluten", "Yumurta"],
                         rating: 4.4,
-                        lastUpdate: "Dün"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Tavuk Tako",
-                        price: 210, // Güncel fiyat
-                        oldPrice: 195, // Eski fiyat (Zam okunu için)
+                        price: 240,
+                        oldPrice: 210,
                         ingredients: "Tavuk, Patates, Ekmek",
-                        allergens: ["Gluten"], // Varsa alerjenler
-                        rating: 4.3, // Ürün puanı
-                        lastUpdate: "5 gün önce"
+                        allergens: ["Gluten"],
+                        rating: 4.3,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Penne Arabiata",
-                        price: 165,
+                        price: 190,
                         oldPrice: 165,
                         ingredients: "Makarna, Domates, Sarımsak, Peynir",
                         allergens: ["Süt ürünü"],
                         rating: 4.6,
-                        lastUpdate: "Dün"
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Kekikli Tavuk",
-                        price: 185, // Güncel fiyat
-                        oldPrice: 185, // Eski fiyat (Zam okunu için)
+                        price: 210,
+                        oldPrice: 185,
                         ingredients: "Kekik, Tavuk, Makarna, Salata",
-                        allergens: [], // Varsa alerjenler
-                        rating: 4.1, // Ürün puanı
-                        lastUpdate: "Bugün"
+                        allergens: [],
+                        rating: 4.1,
+                        lastUpdate: "15 Ocak 2026"
                     },
                     {
                         name: "Köri Soslu Tavuk",
-                        price: 185,
-                        oldPrice: 175,
+                        price: 210,
+                        oldPrice: 185,
                         ingredients: "Köri Baharatı, Zerdeçal, Soğan, Sarımsak, Tavuk",
                         allergens: ["Süt ürünü"],
                         rating: 5.0,
-                        lastUpdate: "Dün"
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Acılı Tavuk",
+                        price: 210,
+                        oldPrice: 0,
+                        ingredients: "Acı soslu tavuk parçaları",
+                        allergens: [],
+                        rating: 4.2,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Tavuk Wrap",
+                        price: 200,
+                        oldPrice: 0,
+                        ingredients: "Tavuk, sebze ve özel soslu wrap",
+                        allergens: ["Gluten"],
+                        rating: 4.5,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Chicken Bazlama",
+                        price: 225,
+                        oldPrice: 0,
+                        ingredients: "Bazlama ekmeğinde tavuk",
+                        allergens: ["Gluten"],
+                        rating: 4.6,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Közburger",
+                        price: 215,
+                        oldPrice: 0,
+                        ingredients: "Özel köz soslu burger",
+                        allergens: ["Gluten"],
+                        rating: 4.7,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Hamburger",
+                        price: 210,
+                        oldPrice: 0,
+                        ingredients: "Klasik dana burger",
+                        allergens: ["Gluten"],
+                        rating: 4.3,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Double 19 Burger",
+                        price: 255,
+                        oldPrice: 0,
+                        ingredients: "Çift köfteli özel burger",
+                        allergens: ["Gluten"],
+                        rating: 4.9,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Çıtır Tavuk Burger",
+                        price: 190,
+                        oldPrice: 165,
+                        ingredients: "Çıtır Tavuk, Özel Sos, Marul, Turşu, Domates",
+                        allergens: ["Gluten"],
+                        rating: 5.0,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Cheeseburger",
+                        price: 190,
+                        oldPrice: 165,
+                        ingredients: "Hamburger Köftesi, Peynir, Marul, Domates",
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 5.0,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Fettuchini Alfredo",
+                        price: 190,
+                        oldPrice: 165,
+                        ingredients: "Krema, Mantar, Makarna",
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.4,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Köri Soslu Alfredo",
+                        price: 190,
+                        oldPrice: 165,
+                        ingredients: "Köri sosu, Tavuk, Makarna",
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.6,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Penne Pesto",
+                        price: 190,
+                        oldPrice: 165,
+                        ingredients: "Parmesan, Fesleğen, Makarna",
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.7,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Mac n'Cheese",
+                        price: 210,
+                        oldPrice: 185,
+                        ingredients: "Peynir, Makarna",
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.9,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Sporcu Menü",
+                        price: 225,
+                        oldPrice: 195,
+                        ingredients: "Yüksek proteinli ızgara tavuk",
+                        allergens: [],
+                        rating: 4.8,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Chicken Fajita",
+                        price: 245,
+                        oldPrice: 210,
+                        ingredients: "Sebzeli tavuk fajita",
+                        allergens: [],
+                        rating: 4.6,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Tavuk Külbastı",
+                        price: 190,
+                        oldPrice: 170,
+                        ingredients: "Tavuk, Baharat",
+                        allergens: [],
+                        rating: 4.6,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Köfte Servis",
+                        price: 285,
+                        oldPrice: 245,
+                        ingredients: "%100 Dana eti köfte",
+                        allergens: [],
+                        rating: 4.7,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Falafel Dürüm",
+                        price: 180,
+                        oldPrice: 155,
+                        ingredients: "Vegan falafel topları ve yeşillik",
+                        allergens: ["Gluten"],
+                        rating: 4.2,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Falafel Bowl",
+                        price: 200,
+                        oldPrice: 175,
+                        ingredients: "Vegan falafel topları ve yeşillik",
+                        allergens: ["Gluten"],
+                        rating: 4.4,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Chicken Bowl",
+                        price: 225,
+                        oldPrice: 195,
+                        ingredients: "Tavuklu protein kasesi",
+                        allergens: [],
+                        rating: 4.5,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Ayvalık Tostu",
+                        price: 110,
+                        oldPrice: 110,
+                        ingredients: "Karışık Ayvalık malzemeleri",
+                        allergens: ["Gluten", "Süt ürünü"],
+                        rating: 4.0,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Tavuk Pirzola",
+                        price: 255,
+                        oldPrice: 225,
+                        ingredients: "Izgara tavuk pirzola",
+                        allergens: [],
+                        rating: 4.6,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Karbon Burger",
+                        price: 225,
+                        oldPrice: 195,
+                        ingredients: "Özel siyah ekmekli burger",
+                        allergens: ["Gluten"],
+                        rating: 4.8,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Chicken Sandviç",
+                        price: 245,
+                        oldPrice: 215,
+                        ingredients: "Özel soslu tavuk sandviç",
+                        allergens: ["Gluten"],
+                        rating: 4.4,
+                        lastUpdate: "15 Ocak 2026"
+                    },
+                    {
+                        name: "Crispy Chicken Sandviç",
+                        price: 255,
+                        oldPrice: 225,
+                        ingredients: "Çıtır tavuklu sandviç",
+                        allergens: ["Gluten", "Yumurta"],
+                        rating: 4.7,
+                        lastUpdate: "15 Ocak 2026"
                     }
                     // Buraya daha fazla ürün ekleyebilirsin...
                 ]
@@ -572,17 +867,17 @@
                     : '';
 
                 return `
-            <div class="menu-item">
-                <div class="item-details">
-                    <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
-                    <p class="item-desc">${prod.ingredients}</p>
-                    ${allergensHtml}
-                </div>
-                <div class="price-box">
-                    <div class="current-price">${prod.price} ₺</div>
-                    ${priceChangeHtml}
-                </div>
-            </div>`;
+                <div class="menu-item">
+                    <div class="item-details">
+                        <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
+                        <p class="item-desc">${prod.ingredients}</p>
+                        ${allergensHtml}
+                    </div>
+                    <div class="price-box">
+                        <div class="current-price">${prod.price} ₺</div>
+                        ${priceChangeHtml}
+                    </div>
+                </div>`;
             }).join('');
 
             // 2. Navigasyon Linki
@@ -597,27 +892,27 @@
 
             // 4. Panelin Ana HTML'ini oluştur
             const html = `
-            <div class="drag-handle-area">
-            <div class="drag-handle-bar"></div>
-            </div>
-            <div class="venue-header">
-                <h2 class="venue-name">${venue.name}</h2>
-                <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
-            </div>
+                <div class="drag-handle-area">
+                <div class="drag-handle-bar"></div>
+                </div>
+                <div class="venue-header">
+                    <h2 class="venue-name">${venue.name}</h2>
+                    <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
+                </div>
 
-            <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
-                📍 Yol Tarifi Al (Google Maps)
-            </button>
+                <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
+                    📍 Yol Tarifi Al (Google Maps)
+                </button>
 
-            <h3>Menü & Fiyatlar</h3>
-            <div style="margin-top: 15px;">
-                ${productsHtml}
-            </div>
+                <h3>Menü & Fiyatlar</h3>
+                <div style="margin-top: 15px;">
+                    ${productsHtml}
+                </div>
 
-            <button class="report-btn" onclick="window.location.href='${mailLink}'">
-                📢 Hata / Fiyat Değişimi Bildir
-            </button>
-        `;
+                <button class="report-btn" onclick="window.location.href='${mailLink}'">
+                    📢 Hata / Fiyat Değişimi Bildir
+                </button>
+            `;
 
             // 5. İçeriği panele bas ve paneli aç
             contentDiv.innerHTML = html;
@@ -646,15 +941,30 @@
         });
 
         // 2. Oku döndüren yardımcı fonksiyon
-        function rotateArrow(deg) {
+        var currentVisualHeading = 0;
+
+        function rotateArrow(newHeading) {
             if (!headingMarker) return;
 
             var iconElement = headingMarker.getElement();
             if (iconElement) {
                 var svg = iconElement.querySelector('svg');
                 if (svg) {
-                    // CSS transition sayesinde yumuşak dönecek
-                    svg.style.transform = `rotate(${deg}deg)`;
+                    // 1. Yeni gelen açı ile şu anki görsel açı arasındaki farkı bul
+                    var diff = newHeading - (currentVisualHeading % 360);
+
+                    // 2. Farkı -180 ile +180 arasına sıkıştır (En kısa yolu bul)
+                    if (diff > 180) {
+                        diff -= 360; // 350 yerine -10 yap
+                    } else if (diff < -180) {
+                        diff += 360; // -350 yerine +10 yap
+                    }
+
+                    // 3. Görsel açıyı güncelle (Kümülatif olarak artır/azalt)
+                    currentVisualHeading += diff;
+
+                    // 4. CSS'e yeni değeri uygula
+                    svg.style.transform = `rotate(${currentVisualHeading}deg)`;
                 }
             }
         }
@@ -793,12 +1103,12 @@
 
         function displaySearchResults(results, term) {
             let htmlContent = `
-                <div class="venue-header">
-                    <h2 class="venue-name">"${term}" için Sonuçlar</h2>
-                    <div class="rating-badge">${results.length} ürün bulundu</div>
-                </div>
-                <div style="margin-top: 15px;">
-            `;
+                    <div class="venue-header">
+                        <h2 class="venue-name">"${term}" için Sonuçlar</h2>
+                        <div class="rating-badge">${results.length} ürün bulundu</div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                `;
 
             results.forEach(item => {
                 // DÜZELTİLEN KISIM BURASI:
@@ -807,21 +1117,21 @@
                 const navLink = `https://www.google.com/maps?q=${item.venueCoords[0]},${item.venueCoords[1]}&mode=walking`;
 
                 htmlContent += `
-                <div class="menu-item" style="border-left: 5px solid #27ae60;">
-                    <div class="item-details">
-                        <span class="venue-tag">📍 ${item.venueName} (${item.venueRating} puan)</span>
-                        <h4>${item.product.name}</h4>
-                        <p class="item-desc">${item.product.ingredients}</p>
-                        
-                        <button style="margin-top:5px; background:#3498db; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;" 
-                                onclick="window.open('${navLink}', '_blank')">
-                            Yol Tarifi ↗
-                        </button>
-                    </div>
-                    <div class="price-box">
-                        <div class="current-price" style="font-size: 1.2rem; color:#e74c3c;">${item.product.price} ₺</div>
-                    </div>
-                </div>`;
+                    <div class="menu-item" style="border-left: 5px solid #27ae60;">
+                        <div class="item-details">
+                            <span class="venue-tag">📍 ${item.venueName} (${item.venueRating} puan)</span>
+                            <h4>${item.product.name}</h4>
+                            <p class="item-desc">${item.product.ingredients}</p>
+
+                            <button style="margin-top:5px; background:#3498db; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;"
+                                    onclick="window.open('${navLink}', '_blank')">
+                                Yol Tarifi ↗
+                            </button>
+                        </div>
+                        <div class="price-box">
+                            <div class="current-price" style="font-size: 1.2rem; color:#e74c3c;">${item.product.price} ₺</div>
+                        </div>
+                    </div>`;
             });
 
             htmlContent += `</div>`;
@@ -893,6 +1203,176 @@
                 panel.style.transform = 'translateY(0)';
             }
         });
+        // --- GİRİŞ PANELİNİ AÇMA FONKSİYONU ---
+        function openAuthPanel() {
+            const contentDiv = document.getElementById('panelContent');
+            const panel = document.getElementById('infoPanel');
+
+            // Eğer kullanıcı zaten giriş yapmışsa (Bunu global değişkenden anlayacağız)
+            if (window.currentUserEmail) {
+                // --- PROFİL GÖRÜNÜMÜ ---
+                contentDiv.innerHTML = `
+            <div class="venue-header">
+                <h2 class="venue-name">Profilim</h2>
+            </div>
+            <div style="text-align:center; margin-top:20px;">
+                <div style="font-size: 3rem;">👋</div>
+                <h3>Merhaba!</h3>
+                <p style="color:#666; margin-bottom:20px;">${window.currentUserEmail}</p>
+                
+                <button class="auth-btn btn-primary" onclick="window.cikisYap(); closePanel();">
+                    Çıkış Yap
+                </button>
+            </div>
+        `;
+            } else {
+                // --- GİRİŞ / KAYIT GÖRÜNÜMÜ ---
+                // Varsayılan olarak Giriş Formu gelsin
+                showLoginForm();
+            }
+
+            panel.classList.add('active');
+        }
+
+        // Giriş Formunu HTML olarak çizen fonksiyon
+        function showLoginForm() {
+            const contentDiv = document.getElementById('panelContent');
+            contentDiv.innerHTML = `
+        <div class="venue-header">
+            <h2 class="venue-name">Giriş Yap</h2>
+            <p>Favorilerinizi kaydetmek için giriş yapın.</p>
+        </div>
+        <div class="auth-form">
+            <input type="email" id="emailInput" class="auth-input" placeholder="E-posta Adresi">
+            <input type="password" id="passInput" class="auth-input" placeholder="Şifre">
+            
+            <button class="auth-btn btn-primary" onclick="handleLogin()">Giriş Yap</button>
+            
+            <p class="auth-toggle-text" onclick="showRegisterForm()">
+                Hesabın yok mu? <strong>Kayıt Ol</strong>
+            </p>
+        </div>
+    `;
+        }
+
+        // Kayıt Formunu HTML olarak çizen fonksiyon
+        function showRegisterForm() {
+            const contentDiv = document.getElementById('panelContent');
+            contentDiv.innerHTML = `
+        <div class="venue-header">
+            <h2 class="venue-name">Kayıt Ol</h2>
+            <p>Yeni bir hesap oluştur.</p>
+        </div>
+        <div class="auth-form">
+            <input type="email" id="emailInput" class="auth-input" placeholder="E-posta Adresi">
+            <input type="password" id="passInput" class="auth-input" placeholder="Şifre (En az 6 karakter)">
+            
+            <button class="auth-btn btn-secondary" onclick="handleRegister()">Kayıt Ol</button>
+            
+            <p class="auth-toggle-text" onclick="showLoginForm()">
+                Zaten hesabın var mı? <strong>Giriş Yap</strong>
+            </p>
+        </div>
+    `;
+        }
+
+        // Butonlara basılınca çalışacak ara fonksiyonlar
+        function handleLogin() {
+            const email = document.getElementById('emailInput').value;
+            const pass = document.getElementById('passInput').value;
+            window.girisYap(email, pass); // Firebase fonksiyonunu çağır
+        }
+
+        function handleRegister() {
+            const email = document.getElementById('emailInput').value;
+            const pass = document.getElementById('passInput').value;
+            window.kayitOl(email, pass); // Firebase fonksiyonunu çağır
+        }
+    </script>
+    <script type="module">
+        // 1. Gerekli kütüphaneleri içeri aktarıyoruz (Auth eklendi)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+        // BURASI EKLENDİ: Kullanıcı giriş işlemleri için gerekli kütüphane
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+        // 2. Senin Firebase Ayarların
+        const firebaseConfig = {
+            apiKey: "AIzaSyDTlQLuyN7DvEdvmPQmwBr3u2I7XVAOfbM",
+            authDomain: "yetu-app-ba044.firebaseapp.com",
+            projectId: "yetu-app-ba044",
+            storageBucket: "yetu-app-ba044.firebasestorage.app",
+            messagingSenderId: "490891866396",
+            appId: "1:490891866396:web:2d93af24e5eccfc93d8ad9",
+            measurementId: "G-BK3GHNQEMB"
+        };
+
+        // 3. Firebase'i Başlat
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app); // Auth servisini başlat
+
+        // --- KULLANILACAK FONKSİYONLARI DIŞARIYA (GLOBAL) AÇMA ---
+        // module yapısı dışarı kapalı olduğu için, butonlardan erişebilmek adına window'a atıyoruz.
+
+        window.kayitOl = async (email, sifre) => {
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, sifre);
+                alert("Kayıt başarılı! Hoşgeldin: " + userCredential.user.email);
+                // İstersen burada paneli kapatma fonksiyonunu çağırabilirsin
+            } catch (error) {
+                alert("Hata: " + error.message);
+            }
+        };
+
+        window.girisYap = async (email, sifre) => {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, sifre);
+                alert("Giriş yapıldı: " + userCredential.user.email);
+                // Giriş panelini kapatıp normal panele dönebilirsin
+            } catch (error) {
+                alert("Giriş Hatası: " + error.message);
+            }
+        };
+
+        window.cikisYap = async () => {
+            try {
+                await signOut(auth);
+                alert("Çıkış yapıldı.");
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        // Kullanıcı durumunu dinle (Giriş yaptı mı yapmadı mı?)
+        onAuthStateChanged(auth, (user) => {
+            const profileBtn = document.getElementById('mainProfileBtn');
+
+            if (user) {
+                console.log("Giriş yapıldı:", user.email);
+                // Kullanıcı bilgisini global değişkene at (diğer script erişsin diye)
+                window.currentUserEmail = user.email;
+
+                // Sağ üstteki butonu "Yeşil Tik" veya Profil resmi yap
+                profileBtn.innerHTML = "✅";
+                profileBtn.style.border = "2px solid #2ecc71";
+
+                // Eğer panel açıksa (Giriş yaptıktan hemen sonra) paneli kapat
+                // (closePanel fonksiyonu global olmadığı için manuel kapatıyoruz)
+                const panel = document.getElementById('infoPanel');
+                if (panel) panel.classList.remove('active');
+
+            } else {
+                console.log("Çıkış yapıldı.");
+                window.currentUserEmail = null;
+
+                // Butonu tekrar gri "Kullanıcı" ikonuna çevir
+                profileBtn.innerHTML = "👤";
+                profileBtn.style.border = "none";
+            }
+        });
+
+        console.log("Firebase ve Auth başarıyla yüklendi.");
     </script>
 </body>
 </html>
