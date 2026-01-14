@@ -247,16 +247,16 @@
             position: absolute;
             top: 20px;
             left: 50%;
-            transform: translateX(-50%); /* Ortalamak için */
-            width: 90%;
-            max-width: 400px; /* Çok geniş ekranda dev gibi olmasın */
+            transform: translateX(-50%);
+            width: calc(100% - 140px);
+            max-width: 400px;
             background: white;
-            border-radius: 30px; /* Google Maps gibi yuvarlak kenarlar */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Derinlik gölgesi */
+            border-radius: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             padding: 5px 5px 5px 20px;
-            z-index: 2000; /* Haritanın en üstünde dursun */
+            z-index: 2000;
         }
 
         .search-input {
