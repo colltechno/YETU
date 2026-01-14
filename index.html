@@ -179,20 +179,6 @@
         .price-stable {
             color: #27ae60;
         }
-
-        /* Logo Alanı */
-        .logo-area {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 999;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            font-weight: bold;
-            color: #c0392b; /* ODTÜ Kırmızısı tonu */
-        }
         /* Yön Okunun Stili */
         .user-heading-arrow {
             z-index: 1000;
@@ -248,7 +234,7 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 140px);
+            width: calc(100% - 160px);
             max-width: 400px;
             background: white;
             border-radius: 30px;
@@ -258,26 +244,15 @@
             padding: 5px 5px 5px 20px;
             z-index: 2000;
         }
-
         .search-input {
             border: none;
             outline: none;
-            flex-grow: 1; /* Kalan boşluğu doldur */
+            flex-grow: 1;
             font-size: 1rem;
             color: #333;
             padding: 10px 0;
+            background: transparent;
         }
-
-        .search-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-left: 10px;
-            object-fit: cover; /* Resmi yuvarlağa sığdır */
-            border: 2px solid #fff; /* Logoya çerçeve */
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        }
-
         /* Arama sonuçları için özel etiket */
         .venue-tag {
             font-size: 0.75rem;
@@ -300,9 +275,10 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            z-index: 1000;
+            z-index: 2001;
         }
 
+        /* Profil butonu ana çerçevesi */
         .profile-btn {
             width: 45px;
             height: 45px;
@@ -311,11 +287,18 @@
             border: none;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             cursor: pointer;
-            font-size: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
+            padding: 0;
+            overflow: hidden; 
+        }
+        .profile-btn-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 50%;
         }
 
             .profile-btn:active {
@@ -370,18 +353,15 @@
 </head>
 <body>
 
-    <div class="logo-area">YETU</div>
-
     <div class="search-container">
         <input type="text" id="searchInput" class="search-input" placeholder="YETU ile istediğini bul!">
-        <img src="logo.png" class="search-logo" alt="YETU">
     </div>
 
     <div id="map"></div>
 
     <div class="profile-btn-container">
         <button id="mainProfileBtn" class="profile-btn" onclick="openAuthPanel()">
-            👤
+            <img src="logo.png" alt="Profil" class="profile-btn-img">
         </button>
     </div>
 
@@ -1367,7 +1347,7 @@
                 window.currentUserEmail = null;
 
                 // Butonu tekrar gri "Kullanıcı" ikonuna çevir
-                profileBtn.innerHTML = "👤";
+                profileBtn.innerHTML = '<img src="logo.png" alt="Profil" class="profile-btn-img">';
                 profileBtn.style.border = "none";
             }
         });
