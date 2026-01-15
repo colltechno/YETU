@@ -349,6 +349,29 @@
             cursor: pointer;
             text-decoration: underline;
         }
+        .add-venue-btn {
+            position: absolute;
+            bottom: 30px; /* Alttan mesafe */
+            left: 20px; /* Soldan mesafe */
+            width: 50px;
+            height: 50px;
+            background-color: #e67e22; /* Turuncu renk */
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-size: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000; /* Haritanın üstünde dursun */
+            display: none; /* Başlangıçta gizli (Sadece admin görecek) */
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+            .add-venue-btn:active {
+                transform: scale(0.9);
+            }
     </style>
 </head>
 <body>
@@ -358,6 +381,10 @@
     </div>
 
     <div id="map"></div>
+
+    <button id="addVenueBtn" class="add-venue-btn" onclick="openAddVenuePanel()">
+        +
+    </button>
 
     <div class="profile-btn-container">
         <button id="mainProfileBtn" class="profile-btn" onclick="openAuthPanel()">
@@ -385,452 +412,28 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // 2. MOCK DATA
-        const venues = [
-            {
-                id: 1,
-                name: "Sunshine Cafe",
-                coords: [39.88992749815751, 32.79066032352153],
-                rating: 4.2,
-                reviews: 128,
-                products: [
-                    {
-                        name: "Tavuklu Sandviç",
-                        price: 85,
-                        oldPrice: 70,
-                        ingredients: "Baget ekmek, ızgara tavuk, marul, özel sos",
-                        allergens: ["Gluten", "Yumurta"],
-                        rating: 4.5,
-                        lastUpdate: "3 gün önce"
-                    },
-                    {
-                        name: "Filtre Kahve",
-                        price: 45,
-                        oldPrice: 45,
-                        ingredients: "%100 Arabica çekirdek",
-                        allergens: [],
-                        rating: 4.8,
-                        lastUpdate: "1 ay önce"
-                    }
-                ]
-            },
-            {
-                id: 2,
-                name: "Çatı Restoran",
-                coords: [39.89280919127174, 32.782262702338535],
-                rating: 4.7,
-                reviews: 342,
-                products: [
-                    {
-                        name: "Çatı Burger",
-                        price: 180,
-                        oldPrice: 150,
-                        ingredients: "150gr dana köfte, cheddar, karamelize soğan",
-                        allergens: ["Gluten", "Süt Ürünleri"],
-                        rating: 4.9,
-                        lastUpdate: "1 hafta önce"
-                    },
-                    {
-                        name: "Mercimek Çorbası",
-                        price: 50,
-                        oldPrice: 40,
-                        ingredients: "Kırmızı mercimek, tereyağlı sos",
-                        allergens: ["Süt Ürünleri"],
-                        rating: 4.3,
-                        lastUpdate: "2 gün önce"
-                    }
-                ]
-            },
-            {
-                id: 3,
-                name: "19. Yurt Restoranı",
-                coords: [39.885744, 32.777485],
-                rating: 4.7,
-                reviews: 56,
-                products: [
-                    {
-                        name: "Peperoni Pizza",
-                        price: 270,
-                        oldPrice: 235,
-                        ingredients: "Peperoni, Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.2,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Karışık Pizza",
-                        price: 275,
-                        oldPrice: 240,
-                        ingredients: "Mısır, Sucuk, Sosis, Kaşar, Zeytin, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.7,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Mexican Pizza",
-                        price: 285,
-                        oldPrice: 250,
-                        ingredients: "Sucuk, Acı Sos, Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.2,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Margarita Pizza",
-                        price: 250,
-                        oldPrice: 220,
-                        ingredients: "Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.8,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Barbekü Pizza",
-                        price: 285,
-                        oldPrice: 250,
-                        ingredients: "Tavuk, Barbekü Sos, Kaşar, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.1,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Ton Balıklı Pizza",
-                        price: 300,
-                        oldPrice: 265,
-                        ingredients: "Ton Balığı, Kaşar, Mısır, Zeytin, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.9,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Üç Peynirli Pizza",
-                        price: 255,
-                        oldPrice: 220,
-                        ingredients: "Kaşar, Mozarella, Tulum Peyniri, Pizza Hamuru",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 5.0,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Çıtır Tenders",
-                        price: 210,
-                        oldPrice: 185,
-                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
-                        allergens: ["Gluten", "Yumurta"],
-                        rating: 4.9,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Cajun Sepeti",
-                        price: 210,
-                        oldPrice: 185,
-                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
-                        allergens: ["Gluten", "Yumurta"],
-                        rating: 3.9,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Cajun Dürüm",
-                        price: 180,
-                        oldPrice: 155,
-                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat, Lavaş",
-                        allergens: ["Gluten", "Yumurta"],
-                        rating: 4.8,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Külah Patso",
-                        price: 115,
-                        oldPrice: 95,
-                        ingredients: "Patates",
-                        allergens: [],
-                        rating: 3.2,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Crispy Chicken",
-                        price: 210,
-                        oldPrice: 180,
-                        ingredients: "Tavuk, Galeta Unu, Yumurta, Baharat",
-                        allergens: ["Gluten", "Yumurta"],
-                        rating: 4.4,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Tavuk Tako",
-                        price: 240,
-                        oldPrice: 210,
-                        ingredients: "Tavuk, Patates, Ekmek",
-                        allergens: ["Gluten"],
-                        rating: 4.3,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Penne Arabiata",
-                        price: 190,
-                        oldPrice: 165,
-                        ingredients: "Makarna, Domates, Sarımsak, Peynir",
-                        allergens: ["Süt ürünü"],
-                        rating: 4.6,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Kekikli Tavuk",
-                        price: 210,
-                        oldPrice: 185,
-                        ingredients: "Kekik, Tavuk, Makarna, Salata",
-                        allergens: [],
-                        rating: 4.1,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Köri Soslu Tavuk",
-                        price: 210,
-                        oldPrice: 185,
-                        ingredients: "Köri Baharatı, Zerdeçal, Soğan, Sarımsak, Tavuk",
-                        allergens: ["Süt ürünü"],
-                        rating: 5.0,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Acılı Tavuk",
-                        price: 210,
-                        oldPrice: 185,
-                        ingredients: "Acı soslu tavuk parçaları",
-                        allergens: [],
-                        rating: 4.2,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Tavuk Wrap",
-                        price: 200,
-                        oldPrice: 175,
-                        ingredients: "Tavuk, sebze ve özel soslu wrap",
-                        allergens: ["Gluten"],
-                        rating: 4.5,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Chicken Bazlama",
-                        price: 225,
-                        oldPrice: 195,
-                        ingredients: "Bazlama ekmeğinde tavuk",
-                        allergens: ["Gluten"],
-                        rating: 4.6,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Közburger",
-                        price: 215,
-                        oldPrice: 185,
-                        ingredients: "Özel köz soslu burger",
-                        allergens: ["Gluten"],
-                        rating: 4.7,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Hamburger",
-                        price: 210,
-                        oldPrice: 180,
-                        ingredients: "Klasik dana burger",
-                        allergens: ["Gluten"],
-                        rating: 4.3,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Double 19 Burger",
-                        price: 255,
-                        oldPrice: 225,
-                        ingredients: "Çift köfteli özel burger",
-                        allergens: ["Gluten"],
-                        rating: 4.9,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Çıtır Tavuk Burger",
-                        price: 190,
-                        oldPrice: 165,
-                        ingredients: "Çıtır Tavuk, Özel Sos, Marul, Turşu, Domates",
-                        allergens: ["Gluten"],
-                        rating: 5.0,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Cheeseburger",
-                        price: 190,
-                        oldPrice: 165,
-                        ingredients: "Hamburger Köftesi, Peynir, Marul, Domates",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 5.0,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Fettuchini Alfredo",
-                        price: 190,
-                        oldPrice: 165,
-                        ingredients: "Krema, Mantar, Makarna",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.4,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Köri Soslu Alfredo",
-                        price: 190,
-                        oldPrice: 165,
-                        ingredients: "Köri sosu, Tavuk, Makarna",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.6,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Penne Pesto",
-                        price: 190,
-                        oldPrice: 165,
-                        ingredients: "Parmesan, Fesleğen, Makarna",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.7,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Mac n'Cheese",
-                        price: 210,
-                        oldPrice: 185,
-                        ingredients: "Peynir, Makarna",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.9,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Sporcu Menü",
-                        price: 225,
-                        oldPrice: 195,
-                        ingredients: "Yüksek proteinli ızgara tavuk",
-                        allergens: [],
-                        rating: 4.8,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Chicken Fajita",
-                        price: 245,
-                        oldPrice: 210,
-                        ingredients: "Sebzeli tavuk fajita",
-                        allergens: [],
-                        rating: 4.6,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Tavuk Külbastı",
-                        price: 190,
-                        oldPrice: 170,
-                        ingredients: "Tavuk, Baharat",
-                        allergens: [],
-                        rating: 4.6,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Köfte Servis",
-                        price: 285,
-                        oldPrice: 245,
-                        ingredients: "%100 Dana eti köfte",
-                        allergens: [],
-                        rating: 4.7,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Falafel Dürüm",
-                        price: 180,
-                        oldPrice: 155,
-                        ingredients: "Vegan falafel topları ve yeşillik",
-                        allergens: ["Gluten"],
-                        rating: 4.2,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Falafel Bowl",
-                        price: 200,
-                        oldPrice: 175,
-                        ingredients: "Vegan falafel topları ve yeşillik",
-                        allergens: ["Gluten"],
-                        rating: 4.4,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Chicken Bowl",
-                        price: 225,
-                        oldPrice: 195,
-                        ingredients: "Tavuklu protein kasesi",
-                        allergens: [],
-                        rating: 4.5,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Ayvalık Tostu",
-                        price: 110,
-                        oldPrice: 110,
-                        ingredients: "Karışık Ayvalık malzemeleri",
-                        allergens: ["Gluten", "Süt ürünü"],
-                        rating: 4.0,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Tavuk Pirzola",
-                        price: 255,
-                        oldPrice: 225,
-                        ingredients: "Izgara tavuk pirzola",
-                        allergens: [],
-                        rating: 4.6,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Karbon Burger",
-                        price: 225,
-                        oldPrice: 195,
-                        ingredients: "Özel siyah ekmekli burger",
-                        allergens: ["Gluten"],
-                        rating: 4.8,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Chicken Sandviç",
-                        price: 245,
-                        oldPrice: 215,
-                        ingredients: "Özel soslu tavuk sandviç",
-                        allergens: ["Gluten"],
-                        rating: 4.4,
-                        lastUpdate: "15 Ocak 2026"
-                    },
-                    {
-                        name: "Crispy Chicken Sandviç",
-                        price: 255,
-                        oldPrice: 225,
-                        ingredients: "Çıtır tavuklu sandviç",
-                        allergens: ["Gluten", "Yumurta"],
-                        rating: 4.7,
-                        lastUpdate: "15 Ocak 2026"
-                    }
-                    // Buraya daha fazla ürün ekleyebilirsin...
-                ]
-            }
-        ];
         // 3. FONKSİYONLAR
         const panel = document.getElementById('infoPanel');
         const contentDiv = document.getElementById('panelContent');
 
         // Haritaya marker ekleme döngüsü
-        venues.forEach(venue => {
-            const marker = L.marker(venue.coords).addTo(map);
 
-            // Marker'a tıklandığında çalışacak olay
-            marker.on('click', () => {
-                openPanel(venue);
-                // Haritayı hafifçe yukarı kaydır ki marker panelin altında kalmasın
-                map.panTo([venue.coords[0] - 0.002, venue.coords[1]]);
-            });
-        });
 
         function openPanel(venue) {
             panel.style.transition = '';
             panel.style.transform = ''; // Varsa manuel kaydırmayı da sıfırla
+
+            // --- ADMIN KONTROLÜ (YENİ) ---
+            let adminButtonHtml = '';
+            // window.isAdmin fonksiyonu var mı ve true dönüyor mu?
+            if (window.isAdmin && window.isAdmin()) {
+                adminButtonHtml = `
+                        <button onclick="window.enableEditMode('${venue.firebaseId}')"
+                                style="background:#34495e; color:white; border:none; padding:5px 10px; border-radius:5px; margin-bottom:10px; cursor:pointer; font-size:0.8rem; width:100%;">
+                            ✏️ Menüyü Düzenle (Admin)
+                        </button>
+                    `;
+            }
             // 1. Ürünlerin HTML içeriğini oluştur
             let productsHtml = venue.products.map(prod => {
                 // Fiyat değişim mantığı
@@ -847,17 +450,17 @@
                     : '';
 
                 return `
-                <div class="menu-item">
-                    <div class="item-details">
-                        <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
-                        <p class="item-desc">${prod.ingredients}</p>
-                        ${allergensHtml}
-                    </div>
-                    <div class="price-box">
-                        <div class="current-price">${prod.price} ₺</div>
-                        ${priceChangeHtml}
-                    </div>
-                </div>`;
+                    <div class="menu-item">
+                        <div class="item-details">
+                            <h4>${prod.name} <span style="font-size:0.8em; color:#f1c40f">★ ${prod.rating}</span></h4>
+                            <p class="item-desc">${prod.ingredients}</p>
+                            ${allergensHtml}
+                        </div>
+                        <div class="price-box">
+                            <div class="current-price">${prod.price} ₺</div>
+                            ${priceChangeHtml}
+                        </div>
+                    </div>`;
             }).join('');
 
             // 2. Navigasyon Linki
@@ -870,31 +473,34 @@
             const mailBody = `Merhaba, ${venue.name} mekanında şu bilgiyi güncellemek/eklemek istiyorum:%0D%0A%0D%0A(Lütfen buraya hatalı fiyatı veya yeni bilgiyi yazınız)`;
             const mailLink = `mailto:yetu.metu26@gmail.com?subject=${mailSubject}&body=${mailBody}`;
 
-            // 4. Panelin Ana HTML'ini oluştur
+            // HTML Şablonu
             const html = `
-                <div class="drag-handle-area">
-                <div class="drag-handle-bar"></div>
-                </div>
-                <div class="venue-header">
-                    <h2 class="venue-name">${venue.name}</h2>
-                    <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
-                </div>
+                    <div class="drag-handle-area">
+                        <div class="drag-handle-bar"></div>
+                    </div>
 
-                <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
-                    📍 Yol Tarifi Al (Google Maps)
-                </button>
+                    <div class="venue-header">
+                        <h2 class="venue-name">${venue.name}</h2>
+                        <div class="rating-badge">${venue.rating} / 5.0 (${venue.reviews} yorum)</div>
+                    </div>
 
-                <h3>Menü & Fiyatlar</h3>
-                <div style="margin-top: 15px;">
-                    ${productsHtml}
-                </div>
+                    ${adminButtonHtml}
 
-                <button class="report-btn" onclick="window.location.href='${mailLink}'">
-                    📢 Hata / Fiyat Değişimi Bildir
-                </button>
-            `;
+                    <button class="nav-btn" onclick="window.open('${navLink}', '_blank')">
+                        📍 Yol Tarifi Al (Google Maps)
+                    </button>
 
-            // 5. İçeriği panele bas ve paneli aç
+                    <h3>Menü & Fiyatlar</h3>
+
+                    <div id="productsContainer" style="margin-top: 15px;">
+                        ${productsHtml}
+                    </div>
+
+                    <button class="report-btn" onclick="window.location.href='${mailLink}'">
+                        📢 Hata / Fiyat Değişimi Bildir
+                    </button>
+                `;
+
             contentDiv.innerHTML = html;
             panel.classList.add('active');
         }
@@ -1055,7 +661,7 @@
             let results = [];
 
             // 1. TÜM MEKANLARI TARA
-            venues.forEach(venue => {
+            window.venues.forEach(venue => {
                 venue.products.forEach(prod => {
                     // Eğer ürün ismi aranan kelimeyi içeriyorsa
                     if (prod.name.toLowerCase().includes(searchTerm)) {
@@ -1083,12 +689,12 @@
 
         function displaySearchResults(results, term) {
             let htmlContent = `
-                    <div class="venue-header">
-                        <h2 class="venue-name">"${term}" için Sonuçlar</h2>
-                        <div class="rating-badge">${results.length} ürün bulundu</div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                `;
+                        <div class="venue-header">
+                            <h2 class="venue-name">"${term}" için Sonuçlar</h2>
+                            <div class="rating-badge">${results.length} ürün bulundu</div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                    `;
 
             results.forEach(item => {
                 // DÜZELTİLEN KISIM BURASI:
@@ -1097,21 +703,21 @@
                 const navLink = `https://www.google.com/maps?q=${item.venueCoords[0]},${item.venueCoords[1]}&mode=walking`;
 
                 htmlContent += `
-                    <div class="menu-item" style="border-left: 5px solid #27ae60;">
-                        <div class="item-details">
-                            <span class="venue-tag">📍 ${item.venueName} (${item.venueRating} puan)</span>
-                            <h4>${item.product.name}</h4>
-                            <p class="item-desc">${item.product.ingredients}</p>
+                        <div class="menu-item" style="border-left: 5px solid #27ae60;">
+                            <div class="item-details">
+                                <span class="venue-tag">📍 ${item.venueName} (${item.venueRating} puan)</span>
+                                <h4>${item.product.name}</h4>
+                                <p class="item-desc">${item.product.ingredients}</p>
 
-                            <button style="margin-top:5px; background:#3498db; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;"
-                                    onclick="window.open('${navLink}', '_blank')">
-                                Yol Tarifi ↗
-                            </button>
-                        </div>
-                        <div class="price-box">
-                            <div class="current-price" style="font-size: 1.2rem; color:#e74c3c;">${item.product.price} ₺</div>
-                        </div>
-                    </div>`;
+                                <button style="margin-top:5px; background:#3498db; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8rem;"
+                                        onclick="window.open('${navLink}', '_blank')">
+                                    Yol Tarifi ↗
+                                </button>
+                            </div>
+                            <div class="price-box">
+                                <div class="current-price" style="font-size: 1.2rem; color:#e74c3c;">${item.product.price} ₺</div>
+                            </div>
+                        </div>`;
             });
 
             htmlContent += `</div>`;
@@ -1192,19 +798,19 @@
             if (window.currentUserEmail) {
                 // --- PROFİL GÖRÜNÜMÜ ---
                 contentDiv.innerHTML = `
-            <div class="venue-header">
-                <h2 class="venue-name">Profilim</h2>
-            </div>
-            <div style="text-align:center; margin-top:20px;">
-                <div style="font-size: 3rem;">👋</div>
-                <h3>Merhaba!</h3>
-                <p style="color:#666; margin-bottom:20px;">${window.currentUserEmail}</p>
-                
-                <button class="auth-btn btn-primary" onclick="window.cikisYap(); closePanel();">
-                    Çıkış Yap
-                </button>
-            </div>
-        `;
+                <div class="venue-header">
+                    <h2 class="venue-name">Profilim</h2>
+                </div>
+                <div style="text-align:center; margin-top:20px;">
+                    <div style="font-size: 3rem;">👋</div>
+                    <h3>Merhaba!</h3>
+                    <p style="color:#666; margin-bottom:20px;">${window.currentUserEmail}</p>
+
+                    <button class="auth-btn btn-primary" onclick="window.cikisYap(); closePanel();">
+                        Çıkış Yap
+                    </button>
+                </div>
+            `;
             } else {
                 // --- GİRİŞ / KAYIT GÖRÜNÜMÜ ---
                 // Varsayılan olarak Giriş Formu gelsin
@@ -1218,42 +824,42 @@
         function showLoginForm() {
             const contentDiv = document.getElementById('panelContent');
             contentDiv.innerHTML = `
-        <div class="venue-header">
-            <h2 class="venue-name">Giriş Yap</h2>
-            <p>Favorilerinizi kaydetmek için giriş yapın.</p>
-        </div>
-        <div class="auth-form">
-            <input type="email" id="emailInput" class="auth-input" placeholder="E-posta Adresi">
-            <input type="password" id="passInput" class="auth-input" placeholder="Şifre">
-            
-            <button class="auth-btn btn-primary" onclick="handleLogin()">Giriş Yap</button>
-            
-            <p class="auth-toggle-text" onclick="showRegisterForm()">
-                Hesabın yok mu? <strong>Kayıt Ol</strong>
-            </p>
-        </div>
-    `;
+            <div class="venue-header">
+                <h2 class="venue-name">Giriş Yap</h2>
+                <p>Favorilerinizi kaydetmek için giriş yapın.</p>
+            </div>
+            <div class="auth-form">
+                <input type="email" id="emailInput" class="auth-input" placeholder="E-posta Adresi">
+                <input type="password" id="passInput" class="auth-input" placeholder="Şifre">
+
+                <button class="auth-btn btn-primary" onclick="handleLogin()">Giriş Yap</button>
+
+                <p class="auth-toggle-text" onclick="showRegisterForm()">
+                    Hesabın yok mu? <strong>Kayıt Ol</strong>
+                </p>
+            </div>
+        `;
         }
 
         // Kayıt Formunu HTML olarak çizen fonksiyon
         function showRegisterForm() {
             const contentDiv = document.getElementById('panelContent');
             contentDiv.innerHTML = `
-        <div class="venue-header">
-            <h2 class="venue-name">Kayıt Ol</h2>
-            <p>Yeni bir hesap oluştur.</p>
-        </div>
-        <div class="auth-form">
-            <input type="email" id="emailInput" class="auth-input" placeholder="E-posta Adresi">
-            <input type="password" id="passInput" class="auth-input" placeholder="Şifre (En az 6 karakter)">
-            
-            <button class="auth-btn btn-secondary" onclick="handleRegister()">Kayıt Ol</button>
-            
-            <p class="auth-toggle-text" onclick="showLoginForm()">
-                Zaten hesabın var mı? <strong>Giriş Yap</strong>
-            </p>
-        </div>
-    `;
+            <div class="venue-header">
+                <h2 class="venue-name">Kayıt Ol</h2>
+                <p>Yeni bir hesap oluştur.</p>
+            </div>
+            <div class="auth-form">
+                <input type="email" id="emailInput" class="auth-input" placeholder="E-posta Adresi">
+                <input type="password" id="passInput" class="auth-input" placeholder="Şifre (En az 6 karakter)">
+
+                <button class="auth-btn btn-secondary" onclick="handleRegister()">Kayıt Ol</button>
+
+                <p class="auth-toggle-text" onclick="showLoginForm()">
+                    Zaten hesabın var mı? <strong>Giriş Yap</strong>
+                </p>
+            </div>
+        `;
         }
 
         // Butonlara basılınca çalışacak ara fonksiyonlar
@@ -1270,11 +876,11 @@
         }
     </script>
     <script type="module">
-        // 1. Gerekli kütüphaneleri içeri aktarıyoruz (Auth eklendi)
+        // 1. Gerekli kütüphaneleri içeri aktarıyoruz
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
-        // BURASI EKLENDİ: Kullanıcı giriş işlemleri için gerekli kütüphane
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
         // 2. Senin Firebase Ayarların
         const firebaseConfig = {
@@ -1290,16 +896,14 @@
         // 3. Firebase'i Başlat
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
-        const auth = getAuth(app); // Auth servisini başlat
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // --- KULLANILACAK FONKSİYONLARI DIŞARIYA (GLOBAL) AÇMA ---
-        // module yapısı dışarı kapalı olduğu için, butonlardan erişebilmek adına window'a atıyoruz.
-
+        // --- GLOBAL FONKSİYONLAR (Butonlar için) ---
         window.kayitOl = async (email, sifre) => {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, sifre);
                 alert("Kayıt başarılı! Hoşgeldin: " + userCredential.user.email);
-                // İstersen burada paneli kapatma fonksiyonunu çağırabilirsin
             } catch (error) {
                 alert("Hata: " + error.message);
             }
@@ -1309,7 +913,6 @@
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, sifre);
                 alert("Giriş yapıldı: " + userCredential.user.email);
-                // Giriş panelini kapatıp normal panele dönebilirsin
             } catch (error) {
                 alert("Giriş Hatası: " + error.message);
             }
@@ -1324,35 +927,234 @@
             }
         };
 
-        // Kullanıcı durumunu dinle (Giriş yaptı mı yapmadı mı?)
+        // --- YENİ MEKAN EKLEME SİSTEMİ ---
+        let selectedCoords = null;
+
+        window.openAddVenuePanel = () => {
+            const panel = document.getElementById('infoPanel');
+            const contentDiv = document.getElementById('panelContent');
+
+            contentDiv.innerHTML = `
+                <div class="venue-header">
+                    <h2 class="venue-name">✨ Yeni Mekan Ekle</h2>
+                </div>
+                <div class="auth-form">
+                    <label>Mekan Adı:</label>
+                    <input type="text" id="newVenueName" class="auth-input" placeholder="Örn: Çatı Kafe">
+
+                    <label>Koordinat (Enlem, Boylam):</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="newVenueCoords" class="auth-input" placeholder="39.9012, 32.8055" >
+                        <button onclick="pickLocationOnMap()" style="background:#3498db; color:white; border:none; border-radius:5px; padding:0 10px; cursor:pointer; white-space:nowrap;">
+                            📍 Haritadan
+                        </button>
+                    </div>
+
+                    <p style="font-size:0.8rem; color:#666; margin-top:5px;">
+                        Google Maps'ten sağ tıkla kopyaladığınız koordinatı buraya yapıştırabilirsiniz.
+                    </p>
+
+                    <button onclick="saveNewVenue()" class="auth-btn btn-primary" style="margin-top:15px;">
+                        ✅ MEKANI OLUŞTUR
+                    </button>
+                </div>
+            `;
+            panel.classList.add('active');
+        };
+
+        window.pickLocationOnMap = () => {
+            alert("Lütfen harita üzerinde mekanın olduğu yere tıklayın.");
+            const panel = document.getElementById('infoPanel');
+            panel.classList.remove('active');
+
+            map.once('click', function (e) {
+                selectedCoords = [e.latlng.lat, e.latlng.lng];
+                window.openAddVenuePanel();
+                setTimeout(() => {
+                    const nameInput = document.getElementById('newVenueName');
+                    const coordInput = document.getElementById('newVenueCoords');
+                    coordInput.value = selectedCoords[0].toFixed(5) + ", " + selectedCoords[1].toFixed(5);
+                }, 100);
+            });
+        };
+
+        window.saveNewVenue = async () => {
+            const name = document.getElementById('newVenueName').value;
+            const coordsInput = document.getElementById('newVenueCoords').value;
+
+            if (!name || !coordsInput) {
+                alert("Lütfen isim ve koordinat bilgilerini girin!");
+                return;
+            }
+
+            let finalCoords = null;
+            try {
+                const parts = coordsInput.split(',');
+                if (parts.length === 2) {
+                    const lat = parseFloat(parts[0].trim());
+                    const lng = parseFloat(parts[1].trim());
+                    if (!isNaN(lat) && !isNaN(lng)) finalCoords = [lat, lng];
+                }
+            } catch (e) { console.error(e); }
+
+            if (!finalCoords) {
+                alert("Koordinat formatı hatalı! Örnek: 39.8912, 32.7801");
+                return;
+            }
+
+            const newVenueData = {
+                name: name,
+                coords: finalCoords,
+                rating: 5.0,
+                reviews: 0,
+                products: [{
+                    name: "Çay",
+                    ingredients: "Standart Bardak Çay",
+                    price: 15,
+                    oldPrice: 10,
+                    rating: 5.0,
+                    lastUpdate: "Bugün",
+                    allergens: []
+                }]
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "venues"), newVenueData);
+                alert("Mekan başarıyla eklendi! 🎉");
+                newVenueData.firebaseId = docRef.id;
+                window.venues.push(newVenueData);
+                const marker = L.marker(newVenueData.coords).addTo(map);
+                marker.on('click', () => { window.openPanel(newVenueData); });
+                window.openPanel(newVenueData);
+            } catch (error) {
+                console.error(error);
+                alert("Hata: " + error.message);
+            }
+        };
+
+        // --- KULLANICI DURUMU DİNLEYİCİSİ (DÜZELTİLDİ) ---
         onAuthStateChanged(auth, (user) => {
             const profileBtn = document.getElementById('mainProfileBtn');
+            const panel = document.getElementById('infoPanel');
 
             if (user) {
+                // GİRİŞ YAPILDI
                 console.log("Giriş yapıldı:", user.email);
-                // Kullanıcı bilgisini global değişkene at (diğer script erişsin diye)
                 window.currentUserEmail = user.email;
 
-                // Sağ üstteki butonu "Yeşil Tik" veya Profil resmi yap
                 profileBtn.innerHTML = "✅";
                 profileBtn.style.border = "2px solid #2ecc71";
 
-                // Eğer panel açıksa (Giriş yaptıktan hemen sonra) paneli kapat
-                // (closePanel fonksiyonu global olmadığı için manuel kapatıyoruz)
-                const panel = document.getElementById('infoPanel');
+                // Admin kontrolü
+                if (window.isAdmin && window.isAdmin()) {
+                    document.getElementById('addVenueBtn').style.display = 'flex';
+                }
+
+                // Eğer giriş paneli açıksa kapat
                 if (panel) panel.classList.remove('active');
 
             } else {
+                // ÇIKIŞ YAPILDI
                 console.log("Çıkış yapıldı.");
                 window.currentUserEmail = null;
 
-                // Butonu tekrar gri "Kullanıcı" ikonuna çevir
+                document.getElementById('addVenueBtn').style.display = 'none';
                 profileBtn.innerHTML = '<img src="logo.png" alt="Profil" class="profile-btn-img">';
                 profileBtn.style.border = "none";
             }
         });
 
-        console.log("Firebase ve Auth başarıyla yüklendi.");
+        // --- ADMIN VE EDİT FONKSİYONLARI ---
+        const ADMIN_EMAILS = ["yetu.metu26@gmail.com", "ihsan1191206@gmail.com"];
+
+        window.isAdmin = function () {
+            return window.currentUserEmail && ADMIN_EMAILS.includes(window.currentUserEmail);
+        };
+
+        window.enableEditMode = (venueId) => {
+            const container = document.getElementById('productsContainer');
+            const venue = window.venues.find(v => v.firebaseId === venueId);
+            if (!venue) return;
+
+            let editHtml = `<div style="margin-bottom:10px; padding:10px; background:#fff3cd; border-radius:8px; font-size:0.9rem;">⚠️ Fiyatları güncelleyip en alttaki Kaydet'e basın.</div>`;
+
+            venue.products.forEach((prod, index) => {
+                editHtml += `
+                    <div class="menu-item" style="flex-direction:column; gap:10px; background:#f9f9f9;">
+                        <div style="font-weight:bold;">${prod.name}</div>
+                        <div style="display:flex; gap:10px;">
+                            <div>
+                                <label style="font-size:0.7rem;">Yeni Fiyat</label>
+                                <input type="number" id="price-${index}" value="${prod.price}" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:5px;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.7rem;">Eski Fiyat</label>
+                                <input type="number" id="oldPrice-${index}" value="${prod.oldPrice}" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:5px;">
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            editHtml += `
+                    <button onclick="saveChanges('${venueId}')" style="width:100%; background:#27ae60; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;">💾 DEĞİŞİKLİKLERİ KAYDET</button>
+                    <button onclick="window.openPanel(window.venues.find(v => v.firebaseId === '${venueId}'))" style="width:100%; background:#95a5a6; color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; cursor:pointer;">iptal</button>
+                `;
+            container.innerHTML = editHtml;
+        };
+
+        window.saveChanges = async (venueId) => {
+            const venue = window.venues.find(v => v.firebaseId === venueId);
+            if (!venue) return;
+
+            const newProducts = venue.products.map((prod, index) => {
+                const newPrice = Number(document.getElementById(`price-${index}`).value);
+                const newOldPrice = Number(document.getElementById(`oldPrice-${index}`).value);
+                let lastUpdate = prod.lastUpdate;
+                if (newPrice !== prod.price) {
+                    const today = new Date();
+                    lastUpdate = today.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                }
+                return { ...prod, price: newPrice, oldPrice: newOldPrice, lastUpdate: lastUpdate };
+            });
+
+            try {
+                const venueRef = doc(db, "venues", venueId);
+                await updateDoc(venueRef, { products: newProducts });
+                alert("Fiyatlar güncellendi! ✅");
+                venue.products = newProducts;
+                window.openPanel(venue);
+            } catch (error) {
+                console.error(error);
+                alert("Hata oluştu: " + error.message);
+            }
+        };
+
+        // --- VERİLERİ ÇEKME FONKSİYONU ---
+        async function mekanlariGetir() {
+            console.log("Veriler çekiliyor...");
+            const querySnapshot = await getDocs(collection(db, "venues"));
+            const gelenMekanlar = [];
+
+            querySnapshot.forEach((doc) => {
+                const veri = doc.data();
+                veri.firebaseId = doc.id;
+                gelenMekanlar.push(veri);
+
+                if (veri.coords) {
+                    const marker = L.marker(veri.coords).addTo(map);
+                    marker.on('click', () => {
+                        if (window.openPanel) window.openPanel(veri);
+                        map.panTo([veri.coords[0] - 0.002, veri.coords[1]]);
+                    });
+                }
+            });
+
+            window.venues = gelenMekanlar;
+            console.log("Mekanlar yüklendi ve haritaya işlendi.");
+        }
+
+        mekanlariGetir();
+        console.log("Firebase, Auth ve Database hazır.");
     </script>
 </body>
 </html>
