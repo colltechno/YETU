@@ -372,6 +372,46 @@
             .add-venue-btn:active {
                 transform: scale(0.9);
             }
+        /* --- ADMİN DÜZENLEME FORMU STİLLERİ --- */
+        .edit-item-box {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative; /* Silme butonu için */
+        }
+
+        .edit-label {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            font-weight: bold;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            box-sizing: border-box; /* Taşmayı engeller */
+        }
+
+        .delete-product-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            align-self: flex-end; /* Sağa yasla */
+        }
     </style>
 </head>
 <body>
@@ -1064,65 +1104,163 @@
             }
         });
 
-        // --- ADMIN VE EDİT FONKSİYONLARI ---
+        // --- ADMIN VE EDİT FONKSİYONLARI (GELİŞTİRİLMİŞ) ---
         const ADMIN_EMAILS = ["yetu.metu26@gmail.com", "ihsan1191206@gmail.com"];
 
         window.isAdmin = function () {
             return window.currentUserEmail && ADMIN_EMAILS.includes(window.currentUserEmail);
         };
 
+        // 1. DÜZENLEME MODUNU AÇ (Eski Fiyat Kutusu Kaldırıldı)
         window.enableEditMode = (venueId) => {
             const container = document.getElementById('productsContainer');
             const venue = window.venues.find(v => v.firebaseId === venueId);
             if (!venue) return;
 
-            let editHtml = `<div style="margin-bottom:10px; padding:10px; background:#fff3cd; border-radius:8px; font-size:0.9rem;">⚠️ Fiyatları güncelleyip en alttaki Kaydet'e basın.</div>`;
+            let editHtml = `
+                <div style="margin-bottom:10px; padding:10px; background:#fff3cd; border-radius:8px; font-size:0.9rem;">
+                    ⚠️ Fiyatı değiştirdiğinizde, sistem şu anki fiyatı otomatik olarak "Eski Fiyat" olarak kaydeder.
+                </div>
+            `;
 
             venue.products.forEach((prod, index) => {
+                const allergenStr = prod.allergens ? prod.allergens.join(", ") : "";
+
                 editHtml += `
-                    <div class="menu-item" style="flex-direction:column; gap:10px; background:#f9f9f9;">
-                        <div style="font-weight:bold;">${prod.name}</div>
-                        <div style="display:flex; gap:10px;">
-                            <div>
-                                <label style="font-size:0.7rem;">Yeni Fiyat</label>
-                                <input type="number" id="price-${index}" value="${prod.price}" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:5px;">
-                            </div>
-                            <div>
-                                <label style="font-size:0.7rem;">Eski Fiyat</label>
-                                <input type="number" id="oldPrice-${index}" value="${prod.oldPrice}" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:5px;">
-                            </div>
-                        </div>
-                    </div>`;
+                <div class="edit-item-box">
+                    <div>
+                        <label class="edit-label">Ürün Adı</label>
+                        <input type="text" id="name-${index}" value="${prod.name}" class="edit-input">
+                    </div>
+
+                    <div>
+                        <label class="edit-label">İçerik / Açıklama</label>
+                        <input type="text" id="desc-${index}" value="${prod.ingredients}" class="edit-input">
+                    </div>
+
+                    <div>
+                        <label class="edit-label">Alerjenler (Virgülle ayırın)</label>
+                        <input type="text" id="allergens-${index}" value="${allergenStr}" placeholder="Örn: Gluten, Süt" class="edit-input">
+                    </div>
+
+                    <div>
+                        <label class="edit-label">Güncel Fiyat (₺)</label>
+                        <input type="number" id="price-${index}" value="${prod.price}" class="edit-input" style="font-weight:bold; color:#27ae60;">
+                    </div>
+
+                    <button onclick="removeProduct('${venueId}', ${index})" class="delete-product-btn">
+                        🗑️ Ürünü Sil
+                    </button>
+                </div>`;
             });
 
             editHtml += `
-                    <button onclick="saveChanges('${venueId}')" style="width:100%; background:#27ae60; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;">💾 DEĞİŞİKLİKLERİ KAYDET</button>
-                    <button onclick="window.openPanel(window.venues.find(v => v.firebaseId === '${venueId}'))" style="width:100%; background:#95a5a6; color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; cursor:pointer;">iptal</button>
-                `;
+                <button onclick="addNewProduct('${venueId}')" 
+                        style="width:100%; background:#3498db; color:white; padding:10px; border:none; border-radius:8px; font-weight:bold; margin-bottom:10px; cursor:pointer;">
+                    ➕ YENİ ÜRÜN EKLE
+                </button>
+
+                <button onclick="saveChanges('${venueId}')" 
+                        style="width:100%; background:#27ae60; color:white; padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+                    💾 DEĞİŞİKLİKLERİ KAYDET
+                </button>
+                
+                <button onclick="window.openPanel(window.venues.find(v => v.firebaseId === '${venueId}'))" 
+                        style="width:100%; background:#95a5a6; color:white; padding:10px; border:none; border-radius:8px; margin-top:5px; cursor:pointer;">
+                    İptal
+                </button>
+            `;
             container.innerHTML = editHtml;
         };
 
+        // 2. YENİ ÜRÜN EKLEME (Helper Fonksiyon)
+        window.addNewProduct = (venueId) => {
+            const venue = window.venues.find(v => v.firebaseId === venueId);
+            if (!venue) return;
+
+            // Boş bir ürün şablonu ekle
+            venue.products.push({
+                name: "Yeni Ürün",
+                ingredients: "",
+                price: 0,
+                oldPrice: 0,
+                rating: 5.0,
+                lastUpdate: "Bugün",
+                allergens: []
+            });
+
+            // Ekranı yenile (Yeni kutucuk görünsün diye)
+            window.enableEditMode(venueId);
+        };
+
+        // 3. ÜRÜN SİLME (Helper Fonksiyon)
+        window.removeProduct = (venueId, index) => {
+            const venue = window.venues.find(v => v.firebaseId === venueId);
+            if (!venue) return;
+
+            if (confirm("Bu ürünü silmek istediğine emin misin?")) {
+                venue.products.splice(index, 1); // Listeden sil
+                window.enableEditMode(venueId);  // Ekranı yenile
+            }
+        };
+
+        // 4. DEĞİŞİKLİKLERİ KAYDET
         window.saveChanges = async (venueId) => {
             const venue = window.venues.find(v => v.firebaseId === venueId);
             if (!venue) return;
 
-            const newProducts = venue.products.map((prod, index) => {
-                const newPrice = Number(document.getElementById(`price-${index}`).value);
-                const newOldPrice = Number(document.getElementById(`oldPrice-${index}`).value);
-                let lastUpdate = prod.lastUpdate;
-                if (newPrice !== prod.price) {
-                    const today = new Date();
-                    lastUpdate = today.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
-                }
-                return { ...prod, price: newPrice, oldPrice: newOldPrice, lastUpdate: lastUpdate };
-            });
-
             try {
+                const newProducts = venue.products.map((prod, index) => {
+                    const newName = document.getElementById(`name-${index}`).value;
+                    const newDesc = document.getElementById(`desc-${index}`).value;
+                    const enteredPrice = Number(document.getElementById(`price-${index}`).value); // Sadece bunu alıyoruz
+
+                    // Alerjenleri işle
+                    const allergensInput = document.getElementById(`allergens-${index}`).value;
+                    const newAllergens = allergensInput.split(',')
+                        .map(s => s.trim())
+                        .filter(s => s.length > 0);
+
+                    // --- OTOMATİK ESKİ FİYAT MANTIĞI ---
+                    let lastUpdate = prod.lastUpdate;
+
+                    // Varsayılan olarak eski fiyat, veritabanındaki neyse o kalsın.
+                    let finalOldPrice = prod.oldPrice;
+
+                    // Ama eğer admin yeni bir fiyat girdiyse:
+                    if (enteredPrice !== prod.price) {
+                        // Şu anki güncel fiyatı, "Eski Fiyat" olarak sakla
+                        finalOldPrice = prod.price;
+
+                        const today = new Date();
+                        lastUpdate = today.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                    } else if (newName !== prod.name) {
+                        // Fiyat değişmedi ama isim değiştiyse de tarihi güncelle
+                        const today = new Date();
+                        lastUpdate = today.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+
+                    return {
+                        ...prod,
+                        name: newName,
+                        ingredients: newDesc,
+                        price: enteredPrice,
+                        oldPrice: finalOldPrice, // Hesaplanan değer
+                        allergens: newAllergens,
+                        lastUpdate: lastUpdate
+                    };
+                });
+
+                // Firestore'a gönder
                 const venueRef = doc(db, "venues", venueId);
                 await updateDoc(venueRef, { products: newProducts });
-                alert("Fiyatlar güncellendi! ✅");
+
+                alert("Menü güncellendi! ✅");
+
+                // Yerel veriyi güncelle ve paneli normal moda döndür
                 venue.products = newProducts;
                 window.openPanel(venue);
+
             } catch (error) {
                 console.error(error);
                 alert("Hata oluştu: " + error.message);
